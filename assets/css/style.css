@@ -1,0 +1,46 @@
+html {
+    padding: 0;
+    margin: 0;
+    background-color: #eee;
+}
+
+body {
+    position: relative;
+    text-align: center;
+    margin: auto;
+}
+
+.heading {
+    font-size: 48pt;
+}
+
+#board {
+    display: inline-block;
+    margin: 30px auto;
+    height: 200px;
+}
+
+#previousWord, #playedWord {
+    width: 400px;
+    float: left;
+}
+
+#prev-ja, #play-ja {
+    font-size: 30pt;
+}
+
+#prev-en, #play-en {
+    font-size: 20pt;
+}
+
+#textEntryDiv {
+    clear: both;
+}
+
+input, button {
+    font-size: 18pt;
+}
+
+#prev-ja-last, #play-ja-first, #prev-en-last, #play-en-first {
+    background-color: cornflowerblue;
+}
