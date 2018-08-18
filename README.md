@@ -3,7 +3,7 @@
 
 A [Japanese rhyming game](https://en.wikipedia.org/wiki/Shiritori).  This is just a proof-of-concept and is missing a lot of required features.
 
-Project in collaboration with [cliffpham](https://github.com/cliffpham).
+**Project in collaboration with [cliffpham](https://github.com/cliffpham).**
 
 Limitations
 -----------
