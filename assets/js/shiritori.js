@@ -96,11 +96,16 @@ const game = {
     },
     checkValidity: function() {
         if (this.playedWords.length > 1) {
-            console.log(this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-1]);
-            console.log(this.playedWords[this.playedWords.length-1][0]);
-        }
-        if (this.playedWords.length > 1) {
-            if (this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-1] === this.playedWords[this.playedWords.length-1][0]) {
+            const prevEnd1 = this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-1];
+            const prevEnd2 = this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-2] + this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-1];
+            const currentStart1 = this.playedWords[this.playedWords.length-1][0];
+            const currentStart2 = this.playedWords[this.playedWords.length-1][0] + this.playedWords[this.playedWords.length-1][1];
+
+            if (prevEnd1 === "ゃ" || prevEnd1 === "ゅ" || prevEnd1 === "ょ") {
+                if (prevEnd2 === currentStart2) {
+                    return true;
+                }
+            } else if (prevEnd1 === currentStart1) {
                 return true;
             } else {
                 console.log("Game over:  New word doesn't start with ending sound of prior word.");
@@ -148,6 +153,7 @@ const game = {
             output[output.length] = syllable;
         }
 
+        console.log(output);
         return output;
     }
 }
@@ -176,16 +182,20 @@ const renderGame = function() {
     } else if (game.playedWords.length === 1) {
         const currentWord = game.playedWords[0];
         const romanizedCurrentWord = game.romanize(currentWord);
-        let currentWordWithoutLastChar = "";
+        const currentWordWithoutLastChar = currentWord.slice(0, -1);
         let romanizedCurrentWordWithoutLastChar = "";
 
-        for (let i = 0; i < currentWord.length-1; i++) {
-            currentWordWithoutLastChar += currentWord[i];
+        for (let i = 0; i < romanizedCurrentWord.length - 1; i++) {
             romanizedCurrentWordWithoutLastChar += `${romanizedCurrentWord[i]} • `;
         }
 
-        prevJa.insertBefore(document.createTextNode(currentWordWithoutLastChar), document.getElementById("prev-ja-last"));
-        document.getElementById("prev-ja-last").textContent = currentWord[currentWord.length-1];
+        if (currentWord[currentWord.length-1] === "ゃ" || currentWord[currentWord.length-1] === "ゅ" || currentWord[currentWord.length-1] === "ょ") {
+            prevJa.insertBefore(document.createTextNode(currentWordWithoutLastChar.slice(0, -1)), document.getElementById("prev-ja-last"));
+            document.getElementById("prev-ja-last").textContent = currentWord[currentWord.length-2] + currentWord[currentWord.length-1];
+        } else {
+            prevJa.insertBefore(document.createTextNode(currentWordWithoutLastChar), document.getElementById("prev-ja-last"));
+            document.getElementById("prev-ja-last").textContent = currentWord[currentWord.length-1];
+        }
 
         prevEn.insertBefore(document.createTextNode(romanizedCurrentWordWithoutLastChar), document.getElementById("prev-en-last"));
         document.getElementById("prev-en-last").textContent = romanizedCurrentWord[romanizedCurrentWord.length-1];
@@ -200,25 +210,34 @@ const renderGame = function() {
         const currentWord = game.playedWords[game.playedWords.length - 1];
         const romanizedPreviousWord = game.romanize(previousWord);
         const romanizedCurrentWord = game.romanize(currentWord);
-        let previousWordWithoutLastChar = "";
-        let currentWordWithoutFirstChar = "";
+        const previousWordWithoutLastChar = previousWord.slice(0, -1);
+        const currentWordWithoutFirstChar = currentWord.slice(1);
         let romanizedPreviousWordWithoutLastChar = "";
         let romanizedCurrentWordWithoutFirstChar = "";
 
-        for (let i = 0; i < previousWord.length-1; i++) {
-            previousWordWithoutLastChar += previousWord[i];
+        for (let i = 0; i < romanizedPreviousWord.length-1; i++) {
             romanizedPreviousWordWithoutLastChar += `${romanizedPreviousWord[i]} • `;
         }
 
-        for (let i = 1; i < currentWord.length; i++) {
-            currentWordWithoutFirstChar += currentWord[i];
+        for (let i = 1; i < romanizedCurrentWord.length; i++) {
             romanizedCurrentWordWithoutFirstChar += ` • ${romanizedCurrentWord[i]}`;
         }
 
-        prevJa.insertBefore(document.createTextNode(previousWordWithoutLastChar), document.getElementById("prev-ja-last"));
-        document.getElementById("prev-ja-last").textContent = previousWord[previousWord.length-1];
-        document.getElementById("play-ja-first").appendChild(document.createTextNode(currentWord[0]));
-        document.getElementById("play-ja").appendChild(document.createTextNode(currentWordWithoutFirstChar));
+        if (previousWord[previousWord.length-1] === "ゃ" || previousWord[previousWord.length-1] === "ゅ" || previousWord[previousWord.length-1] === "ょ") {
+            prevJa.insertBefore(document.createTextNode(previousWordWithoutLastChar.slice(0, -1)), document.getElementById("prev-ja-last"));
+            document.getElementById("prev-ja-last").textContent = previousWord[previousWord.length-2] + previousWord[previousWord.length-1];
+        } else {
+            prevJa.insertBefore(document.createTextNode(previousWordWithoutLastChar), document.getElementById("prev-ja-last"));
+            document.getElementById("prev-ja-last").textContent = previousWord[previousWord.length-1];
+        }
+
+        if (currentWord[1] === "ゃ" || currentWord[1] === "ゅ" || currentWord[1] === "ょ") {
+            document.getElementById("play-ja-first").textContent = currentWord[0] + currentWord[1];
+            document.getElementById("play-ja").appendChild(document.createTextNode(currentWord.slice(2)));
+        } else {
+            document.getElementById("play-ja-first").appendChild(document.createTextNode(currentWord[0]));
+            document.getElementById("play-ja").appendChild(document.createTextNode(currentWordWithoutFirstChar));
+        }
         
         prevEn.insertBefore(document.createTextNode(romanizedPreviousWordWithoutLastChar), document.getElementById("prev-en-last"));
         document.getElementById("prev-en-last").textContent = romanizedPreviousWord[romanizedPreviousWord.length-1];
