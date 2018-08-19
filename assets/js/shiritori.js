@@ -151,6 +151,7 @@ const game = {
                 }
             }
 
+            // handle sokuon っ
             if (!found) {
                 let nextSyllable = "";
 
