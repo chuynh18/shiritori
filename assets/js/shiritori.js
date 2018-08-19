@@ -131,10 +131,11 @@ const game = {
 
         for (let i = 0; i < input.length; i++) {
             let syllable = "";
-
+            let found = false
             for (let j = 0; j < this.jaCharsToEng.length; j++) {
                 if (input[i] === this.jaCharsToEng[j].ja) {
                     syllable += this.jaCharsToEng[j].en;
+                    found = true;
 
                     if (this.jaCharsToEng[j].ja2) {
                         for (let k = 2; k <= 4; k++) {
@@ -150,7 +151,24 @@ const game = {
                 }
             }
 
-            output[output.length] = syllable;
+            if (!found) {
+                let nextSyllable = "";
+
+                for (let k = 0; k < this.jaCharsToEng.length; k++) {
+                    if (input[i+1] === this.jaCharsToEng[k].ja) {
+                        nextSyllable = this.jaCharsToEng[k].en;
+                        break;
+                    }
+                }
+
+                if (!(nextSyllable[0] === "c" && nextSyllable[1] === "h")) {
+                    syllable = nextSyllable[0];
+                }
+            }
+
+            if (syllable !== "") {
+                output[output.length] = syllable;
+            }
         }
 
         return output;
