@@ -12,6 +12,7 @@ Limitations
 
 As mentioned, this is simply a proof-of-concept.  Known limitations are:
 * Does not actually know what words are actual Japanese words
+    * So it won't limit you to just nouns (but of course...  it can't distinguish between real words and gibberish)
 * Text entry box is not restricted to only Japanese characters
 * No katakana support
 * Not awfully friendly for mobile devices
