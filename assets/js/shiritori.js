@@ -163,6 +163,8 @@ const game = {
 
                 if (!(nextSyllable[0] === "c" && nextSyllable[1] === "h")) {
                     syllable = nextSyllable[0];
+                } else {
+                    syllable = "t";
                 }
             }
 
