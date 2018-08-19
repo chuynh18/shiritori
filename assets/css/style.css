@@ -10,8 +10,12 @@ body {
     margin: auto;
 }
 
-.heading {
+#heading {
     font-size: 48pt;
+}
+
+#subheading {
+    font-size: 22pt;
 }
 
 #board {

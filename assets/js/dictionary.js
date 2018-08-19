@@ -309,6 +309,7 @@ const dictionary = [
 {"ja": "しろい", "en": "white"},
 {"ja": "〜じん", "en": "~an, ~ese (nationality)"},
 {"ja": "しんぶん", "en": "newspaper"},
+{"ja": "しりとり", "en": "a Japanese rhyming game"},
 {"ja": "すいようび", "en": "Wednesday"},
 {"ja": "すう", "en": "to breathe, to smoke"},
 {"ja": "スカート", "en": "skirt"},

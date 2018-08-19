@@ -160,11 +160,19 @@ const game = {
 const submitWord = function() {
     const input = document.getElementById("shiritori");
 
-    game.checkRepeatsThenPlay(input.value);
+    if (input.value.trim() !== "") {
+        game.checkRepeatsThenPlay(input.value.trim());
+        input.value = "";
+        renderGame();
+    }
+}
 
-    input.value = "";
-
-    renderGame();
+const preventSubmission = function(event) {
+    var key = event.charCode || event.keyCode || 0;     
+  if (key == 13) {
+    event.preventDefault();
+    submitWord();
+  }
 }
 
 const lastThreeWords = [
@@ -295,12 +303,4 @@ const renderGame = function() {
         document.getElementById("slot-1").classList.add("translate");
         document.getElementById("slot-2").classList.add("translateFadeIn");
     }
-}
-
-const preventSubmission = function(event) {
-    var key = event.charCode || event.keyCode || 0;     
-  if (key == 13) {
-    event.preventDefault();
-    submitWord();
-  }
 }
