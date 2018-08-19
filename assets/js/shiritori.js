@@ -264,7 +264,7 @@ const renderGame = function() {
 
         for (let i = 0; i < dictionary.length; i++) {
             if (currentWord === dictionary[i].ja) {
-                currentWord.textContent = dictionary[i].en;
+                playMeaning.textContent = dictionary[i].en;
                 break;
             }
         }

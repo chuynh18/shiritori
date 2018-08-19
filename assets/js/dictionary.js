@@ -622,7 +622,7 @@ const dictionary = [
 {"ja": "めがね", "en": "a pair of glasses"},
 {"ja": "もう", "en": "already, yet; (one) more"},
 {"ja": "もくようび", "en": "Thursday"},
-{"ja": "もしもし", "en": "hello on the phone"},
+{"ja": "もしもし", "en": "hello (on the phone)"},
 {"ja": "もちろん", "en": "of course"},
 {"ja": "もつ", "en": "to have, to own"},
 {"ja": "もっと", "en": "more"},
