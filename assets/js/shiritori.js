@@ -174,166 +174,126 @@ const lastThreeWords = [
 ];
 
 const renderGame = function() {
-    const prevJa = document.getElementById("prev-ja");
-    const prevEn = document.getElementById("prev-en");
-    const prevMeaning = document.getElementById("prev-meaning");
-    const playJa = document.getElementById("play-ja");
-    const playEn = document.getElementById("play-en");
-    const playMeaning = document.getElementById("play-meaning");
-    const prevJaDisp = document.getElementById("prev-ja-disappear");
-    const prevEnDisp = document.getElementById("prev-en-disappear");
-    const prevMeaningDisp = document.getElementById("prev-meaning-disappear");
+
+    const resetHTML = function() {
+        document.getElementById("slot-1-ja").innerHTML = '<span id="slot-1-ja-last"></span>';
+        document.getElementById("slot-1-en").innerHTML = '<span id="slot-1-en-last"></span>';
+        document.getElementById("slot-2-ja").innerHTML = '<span id="slot-2-ja-first"></span>';
+        document.getElementById("slot-2-en").innerHTML = '<span id="slot-2-en-first"></span>';
+        document.getElementById("slot-0-ja").innerHTML = '<span id="slot-0-ja-last"></span>';
+        document.getElementById("slot-0-en").innerHTML = '<span id="slot-0-en-last"></span>';
+        document.getElementById("slot-0-meaning").textContent = "";
+        document.getElementById("slot-1-meaning").textContent = "";
+        document.getElementById("slot-2-meaning").textContent = "";
+    }
+
+    const renderHTML = function(slotNum) {
+        if (slotNum <= 1) {
+            document.getElementById(`slot-${slotNum}-ja`).insertBefore(document.createTextNode(lastThreeWords[slotNum].jaWithoutLastChar), document.getElementById(`slot-${slotNum}-ja-last`));
+            document.getElementById(`slot-${slotNum}-ja-last`).textContent = lastThreeWords[slotNum].jaLastChar;
+            document.getElementById(`slot-${slotNum}-en`).insertBefore(document.createTextNode(`${lastThreeWords[slotNum].romanizedWithoutLastChar}`), document.getElementById(`slot-${slotNum}-en-last`));
+            document.getElementById(`slot-${slotNum}-en-last`).textContent = `${lastThreeWords[slotNum].romanized[lastThreeWords[slotNum].romanized.length-1]}`;
+        } else {
+            document.getElementById(`slot-${slotNum}-ja-first`).textContent = lastThreeWords[2].jaFirstChar;
+            document.getElementById(`slot-${slotNum}-ja`).appendChild(document.createTextNode(lastThreeWords[2].jaWithoutFirstChar));
+            document.getElementById(`slot-${slotNum}-en`).appendChild(document.createTextNode(lastThreeWords[2].romanizedWithoutFirstChar));
+            document.getElementById(`slot-${slotNum}-en-first`).textContent = lastThreeWords[2].romanized[0];
+        }
+        document.getElementById(`slot-${slotNum}-meaning`).textContent = lastThreeWords[slotNum].meaning;
+    }
+
+    const saveToSlot = function(slotNum) {
+        lastThreeWords[slotNum].ja = game.playedWords[game.playedWords.length - 1];
+        lastThreeWords[slotNum].romanized = game.romanize(lastThreeWords[slotNum].ja);
+        if (lastThreeWords[slotNum].romanized.length === 1) {
+            lastThreeWords[slotNum].romanizedWithoutFirstChar = "";
+            lastThreeWords[slotNum].romanizedWithoutLastChar = "";
+        } else {
+            lastThreeWords[slotNum].romanizedWithoutFirstChar = " • " + lastThreeWords[slotNum].romanized.slice(1).join(" • ");
+            lastThreeWords[slotNum].romanizedWithoutLastChar = lastThreeWords[slotNum].romanized.slice(0, -1).join(" • ") + " • ";
+        }
+
+        if (lastThreeWords[slotNum].ja.length === 1) {
+            lastThreeWords[slotNum].jaWithoutFirstChar = "";
+            lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja;
+            lastThreeWords[slotNum].jaWithoutLastChar = "";
+            lastThreeWords[slotNum].jaLastChar = lastThreeWords[slotNum].ja;
+        } else {
+            if (lastThreeWords[slotNum].ja[1] === "ゃ" || lastThreeWords[slotNum].ja[1] === "ゅ" || lastThreeWords[slotNum].ja[1] === "ょ") {
+                lastThreeWords[slotNum].jaWithoutFirstChar = lastThreeWords[slotNum].ja.slice(2);
+                lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja[0] + lastThreeWords[slotNum].ja[1];
+            } else {
+                lastThreeWords[slotNum].jaWithoutFirstChar = lastThreeWords[slotNum].ja.slice(1);
+                lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja[0];
+            }
+
+            if (lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ゃ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ゅ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ょ") {
+                lastThreeWords[slotNum].jaWithoutLastChar = lastThreeWords[slotNum].ja.slice(0, -2);
+                lastThreeWords[slotNum].jaLastChar = lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-2] + lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1];
+            } else {
+                lastThreeWords[slotNum].jaWithoutLastChar = lastThreeWords[slotNum].ja.slice(0, -1);
+                lastThreeWords[slotNum].jaLastChar = lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1];
+            }
+        }
+
+        for (let i = 0; i < dictionary.length; i++) {
+            let found = false;
+            if (lastThreeWords[slotNum].ja === dictionary[i].ja) {
+                lastThreeWords[slotNum].meaning = dictionary[i].en;
+                found = true;
+                break;
+            }
+
+            if (!found) {
+                lastThreeWords[slotNum].meaning = "";
+            }
+        }
+    }
 
     if (game.playedWords.length === 0) {
-        prevJa.innerHTML = '<span id="prev-ja-last"></span>';
-        prevEn.innerHTML = '<span id="prev-en-last"></span>';
-        playJa.innerHTML = '<span id="play-ja-first"></span>';
-        playEn.innerHTML = '<span id="play-en-first"></span>';
-        prevJaDisp.innerHTML = '<span id="prev-ja-last-disappear">';
-        prevEnDisp.innerHTML = '<span id="prev-en-last-disappear">';
-        prevMeaning.textContent = "";
-        playMeaning.textContent = "";
+        resetHTML();
 
-    } else if (game.playedWords.length === 1) {
-        lastThreeWords[1].ja = game.playedWords[0];
-        lastThreeWords[1].romanized = game.romanize(lastThreeWords[1].ja);
-
-        for (let i = 0; i < lastThreeWords[1].romanized.length - 1; i++) {
-            lastThreeWords[1].romanizedWithoutLastChar += `${lastThreeWords[1].romanized[i]} • `;
-        }
-
-        if (lastThreeWords[1].ja[lastThreeWords[1].ja.length-1] === "ゃ" || lastThreeWords[1].ja[lastThreeWords[1].ja.length-1] === "ゅ" || lastThreeWords[1].ja[lastThreeWords[1].ja.length-1] === "ょ") {
-            lastThreeWords[1].jaWithoutLastChar = lastThreeWords[1].ja.slice(0, -2);
-            lastThreeWords[1].jaLastChar = lastThreeWords[1].ja[0] + lastThreeWords[1].ja[1];
-        } else {
-            lastThreeWords[1].jaWithoutLastChar = lastThreeWords[1].ja.slice(0, -1);
-            lastThreeWords[1].jaLastChar = lastThreeWords[1].ja[0];
-        }
-
-        prevJa.insertBefore(document.createTextNode(lastThreeWords[1].jaWithoutLastChar), document.getElementById("prev-ja-last"));
-        document.getElementById("prev-ja-last").textContent = lastThreeWords[1].jaLastChar;
-
-        prevEn.insertBefore(document.createTextNode(lastThreeWords[1].romanizedWithoutLastChar), document.getElementById("prev-en-last"));
-        document.getElementById("prev-en-last").textContent = lastThreeWords[1].romanized[lastThreeWords[1].romanized.length-1];
-
-        for (let i = 0; i < dictionary.length; i++) {
-            if (lastThreeWords[1].ja === dictionary[i].ja) {
-                lastThreeWords[1].meaning = dictionary[i].en;
-                prevMeaning.textContent = lastThreeWords[1].meaning;
-                break;
+        for (let i = 0; i < lastThreeWords.length; i++) {
+            const keys = Object.keys(lastThreeWords[i]);
+            for (let j = 0; j < keys.length; j++) {
+                lastThreeWords[i][keys[j]] = "";
             }
         }
 
-        document.getElementById("previousWord").classList.add("fadeIn");
+        document.getElementById("slot-0").classList.remove("fadeIn", "translateFadeOut");
+        document.getElementById("slot-1").classList.remove("fadeIn", "translate");
+        document.getElementById("slot-2").classList.remove("fadeIn", "translateFadeIn");
+    } else if (game.playedWords.length === 1) {
+        saveToSlot(1);
+        renderHTML(1);
+
+        document.getElementById("slot-1").classList.add("fadeIn");
 
     } else if (game.playedWords.length === 2){
-        playJa.innerHTML = '<span id="play-ja-first"></span>';
-        playEn.innerHTML = '<span id="play-en-first"></span>';
+        saveToSlot(2);
+        renderHTML(2);
 
-        lastThreeWords[2].ja = game.playedWords[game.playedWords.length - 1];
-        lastThreeWords[2].romanized = game.romanize(lastThreeWords[2].ja);
-        lastThreeWords[2].romanizedWithoutFirstChar = lastThreeWords[2].romanized.slice(1).join(" • ");
-        lastThreeWords[2].romanizedWithoutLastChar = lastThreeWords[2].romanized.slice(0, -1).join(" • ");
-
-        if (lastThreeWords[2].ja[1] === "ゃ" || lastThreeWords[2].ja[1] === "ゅ" || lastThreeWords[2].ja[1] === "ょ") {
-            lastThreeWords[2].jaWithoutFirstChar = lastThreeWords[2].ja.slice(2);
-            lastThreeWords[2].jaFirstChar = lastThreeWords[2].ja[0] + lastThreeWords[2].ja[1];
-        } else {
-            lastThreeWords[2].jaWithoutFirstChar = lastThreeWords[2].ja.slice(1);
-            lastThreeWords[2].jaFirstChar = lastThreeWords[2].ja[0];
-        }
-
-        document.getElementById("play-ja-first").textContent = lastThreeWords[2].jaFirstChar;
-
-        if (lastThreeWords[2].ja[lastThreeWords[2].ja.length-1] === "ゃ" || lastThreeWords[2].ja[lastThreeWords[2].ja.length-1] === "ゅ" || lastThreeWords[2].ja[lastThreeWords[2].ja.length-1] === "ょ") {
-            lastThreeWords[2].jaWithoutLastChar = lastThreeWords[2].ja.slice(0, -2);
-            lastThreeWords[2].jaLastChar = lastThreeWords[2].ja[lastThreeWords[2].ja.length-2] + lastThreeWords[2].ja[lastThreeWords[2].ja.length-1];
-        } else {
-            lastThreeWords[2].jaWithoutLastChar = lastThreeWords[2].ja.slice(0, -1);
-            lastThreeWords[2].jaLastChar = lastThreeWords[2].ja[lastThreeWords[2].ja.length-1];
-        }
-
-        for (let i = 0; i < dictionary.length; i++) {
-            if (lastThreeWords[2].ja === dictionary[i].ja) {
-                lastThreeWords[2].meaning = dictionary[i].en;
-                playMeaning.textContent = lastThreeWords[2].meaning;
-                break;
-            }
-        }
-
-        playJa.appendChild(document.createTextNode(lastThreeWords[2].jaWithoutFirstChar));
-        playEn.appendChild(document.createTextNode(` • ${lastThreeWords[2].romanizedWithoutFirstChar}`));
-        document.getElementById("play-en-first").textContent = lastThreeWords[2].romanized[0];
-
-        document.getElementById("playedWord").classList.add("fadeIn");
+        document.getElementById("slot-2").classList.add("fadeIn");
     } else {
         lastThreeWords[0] = JSON.parse(JSON.stringify(lastThreeWords[1]));
         lastThreeWords[1] = JSON.parse(JSON.stringify(lastThreeWords[2]));
 
-        document.getElementById("previousWordDisappear").classList.remove("fadeIn", "translateFadeOut");
-        document.getElementById("previousWord").classList.remove("fadeIn", "translate");
-        document.getElementById("playedWord").classList.remove("fadeIn", "translateFadeIn");
+        document.getElementById("slot-0").classList.remove("fadeIn", "translateFadeOut");
+        document.getElementById("slot-1").classList.remove("fadeIn", "translate");
+        document.getElementById("slot-2").classList.remove("fadeIn", "translateFadeIn");
 
-        prevJa.innerHTML = '<span id="prev-ja-last"></span>';
-        prevEn.innerHTML = '<span id="prev-en-last"></span>';
-        playJa.innerHTML = '<span id="play-ja-first"></span>';
-        playEn.innerHTML = '<span id="play-en-first"></span>';
-        prevJaDisp.innerHTML = '<span id="prev-ja-last-disappear"></span>';
-        prevEnDisp.innerHTML = '<span id="prev-en-last-disappear"></span>';
+        resetHTML();
+        saveToSlot(2);
+        renderHTML(0);
+        renderHTML(1);
+        renderHTML(2);
 
-        lastThreeWords[2].ja = game.playedWords[game.playedWords.length - 1];
-        lastThreeWords[2].romanized = game.romanize(lastThreeWords[2].ja);
-        lastThreeWords[2].romanizedWithoutFirstChar = lastThreeWords[2].romanized.slice(1).join(" • ");
-        lastThreeWords[2].romanizedWithoutLastChar = lastThreeWords[2].romanized.slice(0, -1).join(" • ");
-
-        if (lastThreeWords[2].ja[1] === "ゃ" || lastThreeWords[2].ja[1] === "ゅ" || lastThreeWords[2].ja[1] === "ょ") {
-            lastThreeWords[2].jaWithoutFirstChar = lastThreeWords[2].ja.slice(2);
-            lastThreeWords[2].jaFirstChar = lastThreeWords[2].ja[0] + lastThreeWords[2].ja[1];
-        } else {
-            lastThreeWords[2].jaWithoutFirstChar = lastThreeWords[2].ja.slice(1);
-            lastThreeWords[2].jaFirstChar = lastThreeWords[2].ja[0];
-        }
-
-        document.getElementById("play-ja-first").textContent = lastThreeWords[2].jaFirstChar;
-
-        if (lastThreeWords[2].ja[lastThreeWords[2].ja.length-1] === "ゃ" || lastThreeWords[2].ja[lastThreeWords[2].ja.length-1] === "ゅ" || lastThreeWords[2].ja[lastThreeWords[2].ja.length-1] === "ょ") {
-            lastThreeWords[2].jaWithoutLastChar = lastThreeWords[2].ja.slice(0, -2);
-            lastThreeWords[2].jaLastChar = lastThreeWords[2].ja[lastThreeWords[2].ja.length-2] + lastThreeWords[2].ja[lastThreeWords[2].ja.length-1];
-        } else {
-            lastThreeWords[2].jaWithoutLastChar = lastThreeWords[2].ja.slice(0, -1);
-            lastThreeWords[2].jaLastChar = lastThreeWords[2].ja[lastThreeWords[2].ja.length-1];
-        }
-
-        for (let i = 0; i < dictionary.length; i++) {
-            if (lastThreeWords[2].ja === dictionary[i].ja) {
-                lastThreeWords[2].meaning = dictionary[i].en;
-                playMeaning.textContent = lastThreeWords[2].meaning;
-                break;
-            }
-        }
-
-        playJa.appendChild(document.createTextNode(lastThreeWords[2].jaWithoutFirstChar));
-        playEn.appendChild(document.createTextNode(` • ${lastThreeWords[2].romanizedWithoutFirstChar}`));
-        document.getElementById("play-en-first").textContent = lastThreeWords[2].romanized[0];
-
-        prevJa.insertBefore(document.createTextNode(lastThreeWords[1].jaWithoutLastChar), document.getElementById("prev-ja-last"));
-        document.getElementById("prev-ja-last").textContent = lastThreeWords[1].jaLastChar;
-        prevEn.insertBefore(document.createTextNode(`${lastThreeWords[1].romanizedWithoutLastChar} • `), document.getElementById("prev-en-last"));
-        document.getElementById("prev-en-last").textContent = `${lastThreeWords[1].romanized[lastThreeWords[1].romanized.length-1]}`;
-        document.getElementById("prev-meaning").textContent = lastThreeWords[1].meaning;
-
-        prevJaDisp.insertBefore(document.createTextNode(lastThreeWords[0].jaWithoutLastChar), document.getElementById("prev-ja-last-disappear"));
-        document.getElementById("prev-ja-last-disappear").textContent = lastThreeWords[0].jaLastChar;
-        prevEnDisp.insertBefore(document.createTextNode(`${lastThreeWords[0].romanizedWithoutLastChar}`), document.getElementById("prev-en-last-disappear"));
-        document.getElementById("prev-en-last-disappear").textContent = `${lastThreeWords[0].romanized[lastThreeWords[0].romanized.length-1]}`;
-        document.getElementById("prev-meaning-disappear").textContent = lastThreeWords[0].meaning;
-
-        void document.getElementById("previousWordDisappear").offsetWidth;
-        void document.getElementById("previousWord").offsetWidth;
-        void document.getElementById("playedWord").offsetWidth;
-        document.getElementById("previousWordDisappear").classList.add("translateFadeOut");
-        document.getElementById("previousWord").classList.add("translate");
-        document.getElementById("playedWord").classList.add("translateFadeIn");
+        void document.getElementById("slot-0").offsetWidth;
+        void document.getElementById("slot-1").offsetWidth;
+        void document.getElementById("slot-2").offsetWidth;
+        document.getElementById("slot-0").classList.add("translateFadeOut");
+        document.getElementById("slot-1").classList.add("translate");
+        document.getElementById("slot-2").classList.add("translateFadeIn");
     }
 }
 

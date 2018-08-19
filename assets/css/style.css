@@ -20,7 +20,7 @@ body {
     height: 200px;
 }
 
-#previousWordDisappear, #previousWord, #playedWord {
+#slot-0, #slot-1, #slot-2 {
     width: 300px;
     height: 150px;
     float: left;
@@ -28,11 +28,11 @@ body {
     right: 150px;
 }
 
-#prev-ja, #play-ja, #prev-ja-disappear {
+#slot-1-ja, #slot-2-ja, #slot-0-ja {
     font-size: 30pt;
 }
 
-#prev-en, #play-en, #prev-en-disappear {
+#slot-1-en, #slot-2-en, #slot-0-en {
     font-size: 20pt;
 }
 
@@ -44,7 +44,7 @@ input, button {
     font-size: 18pt;
 }
 
-#prev-ja-last, #play-ja-first, #prev-en-last, #play-en-first, #prev-ja-last-disappear, #prev-en-last-disappear {
+#slot-1-ja-last, #slot-2-ja-first, #slot-1-en-last, #slot-2-en-first, #slot-0-ja-last, #slot-0-en-last {
     background-color: cornflowerblue;
 }
 
@@ -88,7 +88,7 @@ input, button {
 }
 
 @media only screen and (max-width: 900px) {
-    #previousWordDisappear, #previousWord, #playedWord {
+    #slot-0, #slot-1, #slot-2 {
         width: 250px;
         right: 125px;
     }
@@ -98,17 +98,17 @@ input, button {
         100% {left: -125px}
     }
 
-    #prev-ja, #play-ja, #prev-ja-disappear {
+    #slot-1-ja, #slot-2-ja, #slot-0-ja {
         font-size: 28pt;
     }
     
-    #prev-en, #play-en, #prev-en-disappear {
+    #slot-1-en, #slot-2-en, #slot-0-en {
         font-size: 18pt;
     }
 }
 
 @media only screen and (max-width: 760px) {
-    #previousWordDisappear, #previousWord, #playedWord {
+    #slot-0, #slot-1, #slot-2 {
         width: 200px;
         right: 100px;
     }
@@ -118,11 +118,11 @@ input, button {
         100% {left: -100px}
     }
 
-    #prev-ja, #play-ja, #prev-ja-disappear {
+    #slot-1-ja, #slot-2-ja, #slot-0-ja {
         font-size: 24pt;
     }
     
-    #prev-en, #play-en, #prev-en-disappear {
+    #slot-1-en, #slot-2-en, #slot-0-en {
         font-size: 16pt;
     }
 }
@@ -132,7 +132,7 @@ input, button {
         height: 150px;
     }
 
-    #previousWordDisappear, #previousWord, #playedWord {
+    #slot-0, #slot-1, #slot-2 {
         width: 150px;
         right: 75px;
     }
@@ -142,11 +142,11 @@ input, button {
         100% {left: -75px}
     }
 
-    #prev-ja, #play-ja, #prev-ja-disappear {
+    #slot-1-ja, #slot-2-ja, #slot-0-ja {
         font-size: 18pt;
     }
     
-    #prev-en, #play-en, #prev-en-disappear {
+    #slot-1-en, #slot-2-en, #slot-0-en {
         font-size: 12pt;
     }
 }
@@ -156,7 +156,7 @@ input, button {
         height: 130px;
     }
 
-    #previousWordDisappear, #previousWord, #playedWord {
+    #slot-0, #slot-1, #slot-2 {
         width: 120px;
         right: 60px;
     }
@@ -166,11 +166,11 @@ input, button {
         100% {left: -60px}
     }
 
-    #prev-ja, #play-ja, #prev-ja-disappear {
+    #slot-1-ja, #slot-2-ja, #slot-0-ja {
         font-size: 14pt;
     }
     
-    #prev-en, #play-en, #prev-en-disappear {
+    #slot-1-en, #slot-2-en, #slot-0-en {
         font-size: 10pt;
     }
 
