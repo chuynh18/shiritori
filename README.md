@@ -5,6 +5,8 @@ A [Japanese rhyming game](https://en.wikipedia.org/wiki/Shiritori).  This is jus
 
 **Project in collaboration with [cliffpham](https://github.com/cliffpham).**
 
+![gameplay snippet](assets/img/example.gif)
+
 Limitations
 -----------
 
