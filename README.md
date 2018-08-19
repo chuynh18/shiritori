@@ -15,6 +15,6 @@ As mentioned, this is simply a proof-of-concept.  Known limitations are:
     * So it won't limit you to just nouns (but of course...  it can't distinguish between real words and gibberish)
 * Text entry box is not restricted to only Japanese characters
 * No katakana support
-* Not awfully friendly for mobile devices
+* First pass at mobile responsiveness is in, but I'm not sure how it actually looks across all mobile devices.
 
 Of course, there may be bugs!
