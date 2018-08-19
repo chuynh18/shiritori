@@ -20,16 +20,19 @@ body {
     height: 200px;
 }
 
-#previousWord, #playedWord {
-    width: 400px;
+#previousWordDisappear, #previousWord, #playedWord {
+    width: 300px;
+    height: 150px;
     float: left;
+    position: relative;
+    right: 150px;
 }
 
-#prev-ja, #play-ja {
+#prev-ja, #play-ja, #prev-ja-disappear {
     font-size: 30pt;
 }
 
-#prev-en, #play-en {
+#prev-en, #play-en, #prev-en-disappear {
     font-size: 20pt;
 }
 
@@ -41,6 +44,137 @@ input, button {
     font-size: 18pt;
 }
 
-#prev-ja-last, #play-ja-first, #prev-en-last, #play-en-first {
+#prev-ja-last, #play-ja-first, #prev-en-last, #play-en-first, #prev-ja-last-disappear, #prev-en-last-disappear {
     background-color: cornflowerblue;
+}
+
+.fadeIn {
+    animation-name: fade-in;
+    animation-duration: 750ms;
+    animation-fill-mode: forwards;
+}
+
+.translate {
+    animation-name: translate-left;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+
+.translateFadeIn {
+    animation-name: translate-left, fade-in;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+
+.translateFadeOut {
+    animation-name: translate-left, fade-out;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fade-in {
+    0% {opacity: 0}
+    100% {opacity: 1}
+}
+
+@keyframes fade-out {
+    0% {opacity: 1}
+    100% {opacity: 0; display: initial;}
+}
+
+@keyframes translate-left {
+    0% {left: 150px}
+    100% {left: -150px}
+}
+
+@media only screen and (max-width: 900px) {
+    #previousWordDisappear, #previousWord, #playedWord {
+        width: 250px;
+        right: 125px;
+    }
+
+    @keyframes translate-left {
+        0% {left: 125px}
+        100% {left: -125px}
+    }
+
+    #prev-ja, #play-ja, #prev-ja-disappear {
+        font-size: 28pt;
+    }
+    
+    #prev-en, #play-en, #prev-en-disappear {
+        font-size: 18pt;
+    }
+}
+
+@media only screen and (max-width: 760px) {
+    #previousWordDisappear, #previousWord, #playedWord {
+        width: 200px;
+        right: 100px;
+    }
+
+    @keyframes translate-left {
+        0% {left: 100px}
+        100% {left: -100px}
+    }
+
+    #prev-ja, #play-ja, #prev-ja-disappear {
+        font-size: 24pt;
+    }
+    
+    #prev-en, #play-en, #prev-en-disappear {
+        font-size: 16pt;
+    }
+}
+
+@media only screen and (max-width: 610px) {
+    #board {
+        height: 150px;
+    }
+
+    #previousWordDisappear, #previousWord, #playedWord {
+        width: 150px;
+        right: 75px;
+    }
+
+    @keyframes translate-left {
+        0% {left: 75px}
+        100% {left: -75px}
+    }
+
+    #prev-ja, #play-ja, #prev-ja-disappear {
+        font-size: 18pt;
+    }
+    
+    #prev-en, #play-en, #prev-en-disappear {
+        font-size: 12pt;
+    }
+}
+
+@media only screen and (max-width: 460px) {
+    #board {
+        height: 130px;
+    }
+
+    #previousWordDisappear, #previousWord, #playedWord {
+        width: 120px;
+        right: 60px;
+    }
+
+    @keyframes translate-left {
+        0% {left: 60px}
+        100% {left: -60px}
+    }
+
+    #prev-ja, #play-ja, #prev-ja-disappear {
+        font-size: 14pt;
+    }
+    
+    #prev-en, #play-en, #prev-en-disappear {
+        font-size: 10pt;
+    }
+
+    input, button {
+        font-size: 14pt;
+    }
 }
