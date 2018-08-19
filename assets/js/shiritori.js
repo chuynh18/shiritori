@@ -153,7 +153,6 @@ const game = {
             output[output.length] = syllable;
         }
 
-        console.log(output);
         return output;
     }
 }
@@ -173,12 +172,17 @@ const renderGame = function() {
     const prevEn = document.getElementById("prev-en");
     const playJa = document.getElementById("play-ja");
     const playEn = document.getElementById("play-en");
+    const prevMeaning = document.getElementById("prev-meaning");
+    const playMeaning = document.getElementById("play-meaning");
 
     if (game.playedWords.length === 0) {
         prevJa.innerHTML = '<span id="prev-ja-last"></span>';
         prevEn.innerHTML = '<span id="prev-en-last"></span>';
         playJa.innerHTML = '<span id="play-ja-first"></span>';
         playEn.innerHTML = '<span id="play-en-first"></span>';
+        prevMeaning.textContent = "";
+        playMeaning.textContent = "";
+
     } else if (game.playedWords.length === 1) {
         const currentWord = game.playedWords[0];
         const romanizedCurrentWord = game.romanize(currentWord);
@@ -199,6 +203,13 @@ const renderGame = function() {
 
         prevEn.insertBefore(document.createTextNode(romanizedCurrentWordWithoutLastChar), document.getElementById("prev-en-last"));
         document.getElementById("prev-en-last").textContent = romanizedCurrentWord[romanizedCurrentWord.length-1];
+
+        for (let i = 0; i < dictionary.length; i++) {
+            if (currentWord === dictionary[i].ja) {
+                prevMeaning.textContent = dictionary[i].en;
+                break;
+            }
+        }
 
     } else {
         prevJa.innerHTML = '<span id="prev-ja-last"></span>';
@@ -233,16 +244,30 @@ const renderGame = function() {
 
         if (currentWord[1] === "ゃ" || currentWord[1] === "ゅ" || currentWord[1] === "ょ") {
             document.getElementById("play-ja-first").textContent = currentWord[0] + currentWord[1];
-            document.getElementById("play-ja").appendChild(document.createTextNode(currentWord.slice(2)));
+            playJa.appendChild(document.createTextNode(currentWord.slice(2)));
         } else {
             document.getElementById("play-ja-first").appendChild(document.createTextNode(currentWord[0]));
-            document.getElementById("play-ja").appendChild(document.createTextNode(currentWordWithoutFirstChar));
+            playJa.appendChild(document.createTextNode(currentWordWithoutFirstChar));
         }
         
         prevEn.insertBefore(document.createTextNode(romanizedPreviousWordWithoutLastChar), document.getElementById("prev-en-last"));
         document.getElementById("prev-en-last").textContent = romanizedPreviousWord[romanizedPreviousWord.length-1];
         document.getElementById("play-en-first").appendChild(document.createTextNode(romanizedCurrentWord[0]));
         document.getElementById("play-en").appendChild(document.createTextNode(romanizedCurrentWordWithoutFirstChar));
+
+        for (let i = 0; i < dictionary.length; i++) {
+            if (previousWord === dictionary[i].ja) {
+                prevMeaning.textContent = dictionary[i].en;
+                break;
+            }
+        }
+
+        for (let i = 0; i < dictionary.length; i++) {
+            if (currentWord === dictionary[i].ja) {
+                currentWord.textContent = dictionary[i].en;
+                break;
+            }
+        }
     }
 }
 
