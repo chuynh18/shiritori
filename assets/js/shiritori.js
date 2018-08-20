@@ -2,8 +2,8 @@
 
 // === All Shiritori game data and logic lives inside this game object ===
 const game = {
-    playedWords: [],
-    jaCharsToEng: [
+    playedWords: [], // stores all the words that have been played in the current round; is reset to empty array upon game reset
+    jaCharsToEng: [ // lookup table of Hiragana, Katakana, and associated Romaji; used to generate Romaji
         {ja: "あ", en: "a", ka: "ア"},
         {ja: "い", en: "i", ka: "イ"},
         {ja: "う", en: "u", ka: "ウ"},
@@ -79,6 +79,8 @@ const game = {
         {ja: "ぽ", en: "po", ka: "ポ"}
     ],
     timer: 30, // someday this will get used
+    // this enforces a rule of Shiritori:  words cannot be used more than once
+    // once this check is passed, it kicks off all the other game logic
     checkRepeatsThenPlay: function(input) {
         if (this.playedWords.indexOf(input) !== -1) {
             console.log("Game over:  Repeat detected.");
@@ -88,14 +90,15 @@ const game = {
             this.pushWord(input);
         }
     },
+    // this pushes the played word into the array of already played words, then kicks off the other rules-enforcement logic
     pushWord: function(input) {
         this.playedWords[this.playedWords.length] = input;
         if ((this.checkValidity() === false || this.checkN() === false) && this.playedWords.length > 1) {
             this.resetGame();
-            // other game over code here
+            // other game over code can go here if we want anything to happen upon loss
         }
     },
-    // This enforces the rules of Shiritori:  the last phoneme of prior word must match first phoneme of following word
+    // This enforces the main rule of Shiritori:  the last phoneme of prior word must match first phoneme of following word
     // This method will match hiragana and katakana successfully.
     // This function will also consider the following characters to be equivalent:  じ, ぢ, ジ, and ヂ
     checkValidity: function() {
@@ -120,20 +123,26 @@ const game = {
             }
         }
 
+        // this logic only makes sense to kick off after more than one word has been played
+        // it basically compares the ending of the prior word with the beginning of the following word
+        // there are some special cases to account for digraphs and the "ji" phoneme
         if (this.playedWords.length > 1) {
             const prevEnd1 = this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-1];
             const prevEnd2 = this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-2] + this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-1];
-            const prevEndConverted1 = lookupCounterpart(prevEnd1);
+            const prevEndConverted1 = lookupCounterpart(prevEnd1); // this (and the following) variable are specifically to handle Hiragana-Katakana comparisons
             const prevEndConverted2 = lookupCounterpart(prevEnd1) + lookupCounterpart(this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-2]);
             const currentStart1 = this.playedWords[this.playedWords.length-1][0];
             const currentStart2 = this.playedWords[this.playedWords.length-1][0] + this.playedWords[this.playedWords.length-1][1];
 
+            // this handles Hiragana and Katakana digraphs
             if (prevEnd1 === "ゃ" || prevEnd1 === "ゅ" || prevEnd1 === "ょ" || prevEnd1 === "ャ" || prevEnd1 === "ュ" || prevEnd1 === "ョ") {
                 if (prevEnd2 === currentStart2 || prevEndConverted2 === currentStart2) {
                     return true;
                 }
+            // this handles the vast majority of cases
             } else if (prevEnd1 === currentStart1 || prevEndConverted1 === currentStart1) {
                 return true;
+            // this handles the "ji" phonemes
             } else if (prevEnd1 === "じ" || prevEnd1 === "ぢ" || prevEnd1 === "ジ" || prevEnd1 === "ヂ") {
                 if (currentStart1 === "じ" || currentStart1 === "ぢ" || currentStart1 === "ジ" || currentStart1 === "ヂ") {
                     return true;
@@ -145,6 +154,7 @@ const game = {
             }
         }
     },
+    // this enforces a rule of Shiritori:  words cannot end in ん or ン ("n" sound), as no words begin this way
     checkN: function() {
         if (this.playedWords[this.playedWords.length-1][this.playedWords[this.playedWords.length-1].length-1] === "ん") {
             console.log("Game over:  Word ends with ん.");
@@ -170,15 +180,18 @@ const romanize = function(input) {
     let output = [];
     let containsKatakana = false;
 
+    // iterate through the input string
     for (let i = 0; i < input.length; i++) {
         let syllable = "";
         let found = false
 
+        // iterate through the Hiragana/Katakana lookup table
         for (let j = 0; j < game.jaCharsToEng.length; j++) {
             if (input[i] === game.jaCharsToEng[j].ja) {
                 syllable += game.jaCharsToEng[j].en;
                 found = true;
 
+                // if the character has associated digraphs, check our input to see if it is a digraph
                 if (game.jaCharsToEng[j].ja2) {
                     for (let k = 2; k <= 4; k++) {
                         if (input[i+1] === game.jaCharsToEng[j][`ja${k}`]) {
@@ -189,11 +202,11 @@ const romanize = function(input) {
                     }
                 }
 
-                break;
+                break; // no need to continue the linear search once a match has been found
             }
         }
 
-        // handle sokuon っ
+        // handle Sokuon (っ)
         if (!found && input[i] === "っ") {
             let nextSyllable = "";
 
@@ -204,14 +217,16 @@ const romanize = function(input) {
                 }
             }
 
+            // if the phoneme isn't a "ch" sound, double up the consonant sound of the following syllable
             if (!(nextSyllable[0] === "c" && nextSyllable[1] === "h")) {
                 syllable = nextSyllable[0];
+            // when writing in Romaji, "ch" sounds are preceded by a "t"
             } else {
                 syllable = "t";
             }
         } else if (!found) { // if this branch runs, no hiragana was found.  Assume katakana
             containsKatakana = true;
-            break;
+            break; // breaks out of the hiragana loop
         }
 
         if (syllable !== "") {
@@ -219,7 +234,8 @@ const romanize = function(input) {
         }
     }
 
-    // handle katakana
+    // handle Katakana; this is virtually exactly the same logic as the Hiragana loop
+    // There's an opportunity to greatly simplify the romanize function by having the Hiragana and Katakana loops share code
     if (containsKatakana) {
         for (let i = 0; i < input.length; i++) {
             let syllable = "";
@@ -244,7 +260,7 @@ const romanize = function(input) {
                 }
             }
 
-            // handle sokuon ッ
+            // handle Sokuon (ッ)
             if (!found && input[i] === "ッ") {
                 let nextSyllable = "";
 
@@ -260,6 +276,7 @@ const romanize = function(input) {
                 } else {
                     syllable = "t";
                 }
+            // handle Chōonpu (ー)
             } else if (!found && input[i] === "ー") {
                 const lastLetterOfLastSyllable = output[output.length-1][output[output.length-1].length-1];
                 const lastSyllable = output[output.length-1];
@@ -296,6 +313,7 @@ const romanize = function(input) {
     return output;
 }
 
+// attached to "Play" button
 const submitWord = function() {
     const input = document.getElementById("shiritori");
 
@@ -306,6 +324,7 @@ const submitWord = function() {
     }
 }
 
+// attached to text entry box (prevents default; makes enter key only kick off game logic)
 const submitOnEnter = function(event) {
     var key = event.charCode || event.keyCode || 0;     
     if (key == 13) {
@@ -314,26 +333,35 @@ const submitOnEnter = function(event) {
     }
 }
 
+// array of objects used to store the last 3 played words
+// this way, each word is only processed once, after it was initially played
+// we don't have to recompute words; only read them from this array
 const lastThreeWords = [
     {ja: "", jaFirstChar: "", jaLastChar:"", jaWithoutFirstChar: "", jaWithoutLastChar: "", meaning: "", romanized: "", romanizedWithoutLastChar: "", romanizedWithoutFirstChar: ""},
     {ja: "", jaFirstChar: "", jaLastChar:"", jaWithoutFirstChar: "", jaWithoutLastChar: "", meaning: "", romanized: "", romanizedWithoutLastChar: "", romanizedWithoutFirstChar: ""},
     {ja: "", jaFirstChar: "", jaLastChar:"", jaWithoutFirstChar: "", jaWithoutLastChar: "", meaning: "", romanized: "", romanizedWithoutLastChar: "", romanizedWithoutFirstChar: ""}
 ];
 
+// This function and its inner helper functions handle virtually all the DOM manipulation necessary to make the game display
 const renderGame = function() {
 
+    // blanks all three word slots
     const resetHTML = function() {
+        document.getElementById("slot-0-ja").innerHTML = '<span id="slot-0-ja-last"></span>';
+        document.getElementById("slot-0-en").innerHTML = '<span id="slot-0-en-last"></span>';
         document.getElementById("slot-1-ja").innerHTML = '<span id="slot-1-ja-last"></span>';
         document.getElementById("slot-1-en").innerHTML = '<span id="slot-1-en-last"></span>';
         document.getElementById("slot-2-ja").innerHTML = '<span id="slot-2-ja-first"></span>';
         document.getElementById("slot-2-en").innerHTML = '<span id="slot-2-en-first"></span>';
-        document.getElementById("slot-0-ja").innerHTML = '<span id="slot-0-ja-last"></span>';
-        document.getElementById("slot-0-en").innerHTML = '<span id="slot-0-en-last"></span>';
         document.getElementById("slot-0-meaning").textContent = "";
         document.getElementById("slot-1-meaning").textContent = "";
         document.getElementById("slot-2-meaning").textContent = "";
     }
 
+    // reads a word from index slotNum in the lastThreeWords array and renders it onto the page in slot number slotNum
+    // slot 0:  used to fade out the previously played word
+    // slot 1:  the ending of the word in this slot must match the beginning of the word in slot 2
+    // slot 2:  the beginning of the word in this slot must match the ending of the word in slot 1
     const renderHTML = function(slotNum) {
         if (slotNum <= 1) {
             document.getElementById(`slot-${slotNum}-ja`).insertBefore(document.createTextNode(lastThreeWords[slotNum].jaWithoutLastChar), document.getElementById(`slot-${slotNum}-ja-last`));
@@ -349,9 +377,13 @@ const renderGame = function() {
         document.getElementById(`slot-${slotNum}-meaning`).textContent = lastThreeWords[slotNum].meaning;
     }
 
+    // reads the last word in the game.playedWords array and saves it to the lastThreeWords array in index slotNum
+    // handles all the character manipulation necessary to make the game work
     const saveToSlot = function(slotNum) {
-        lastThreeWords[slotNum].ja = game.playedWords[game.playedWords.length - 1];
-        lastThreeWords[slotNum].romanized = romanize(lastThreeWords[slotNum].ja);
+        lastThreeWords[slotNum].ja = game.playedWords[game.playedWords.length - 1]; // save the Hiragana/Katakana
+        lastThreeWords[slotNum].romanized = romanize(lastThreeWords[slotNum].ja); // save the associated Romaji
+
+        // Saves the Romaji without the first and last phonemes as strings.  Each phoneme is separated by " • "
         if (lastThreeWords[slotNum].romanized.length === 1) {
             lastThreeWords[slotNum].romanizedWithoutFirstChar = "";
             lastThreeWords[slotNum].romanizedWithoutLastChar = "";
@@ -360,12 +392,15 @@ const renderGame = function() {
             lastThreeWords[slotNum].romanizedWithoutLastChar = lastThreeWords[slotNum].romanized.slice(0, -1).join(" • ") + " • ";
         }
 
+        // Same as above for the Hiragana or Katakana, but without the " • " in between each phoneme
         if (lastThreeWords[slotNum].ja.length === 1) {
             lastThreeWords[slotNum].jaWithoutFirstChar = "";
             lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja;
             lastThreeWords[slotNum].jaWithoutLastChar = "";
             lastThreeWords[slotNum].jaLastChar = lastThreeWords[slotNum].ja;
         } else {
+            // special case logic for digraphs (as digraphs use 2 characters to represent a phoneme)
+            // this is for the first phoneme
             if (lastThreeWords[slotNum].ja[1] === "ゃ" || lastThreeWords[slotNum].ja[1] === "ゅ" || lastThreeWords[slotNum].ja[1] === "ょ" || lastThreeWords[slotNum].ja[1] === "ャ" || lastThreeWords[slotNum].ja[1] === "ュ" || lastThreeWords[slotNum].ja[1] === "ョ") {
                 lastThreeWords[slotNum].jaWithoutFirstChar = lastThreeWords[slotNum].ja.slice(2);
                 lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja[0] + lastThreeWords[slotNum].ja[1];
@@ -373,7 +408,7 @@ const renderGame = function() {
                 lastThreeWords[slotNum].jaWithoutFirstChar = lastThreeWords[slotNum].ja.slice(1);
                 lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja[0];
             }
-
+            // and this is for the last phoneme
             if (lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ゃ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ゅ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ょ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ャ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ュ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ョ") {
                 lastThreeWords[slotNum].jaWithoutLastChar = lastThreeWords[slotNum].ja.slice(0, -2);
                 lastThreeWords[slotNum].jaLastChar = lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-2] + lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1];
@@ -383,6 +418,8 @@ const renderGame = function() {
             }
         }
 
+        // look up the played word to see if it lives in our (extremely limited) dictionary file.
+        // if it does, we can show the English meaning of the word
         for (let i = 0; i < dictionary.length; i++) {
             let found = false;
             if (lastThreeWords[slotNum].ja === dictionary[i].ja) {
@@ -398,11 +435,14 @@ const renderGame = function() {
     }
 
     if (game.playedWords.length === 0) {
-        resetHTML();
+        resetHTML(); // blank the page
 
+        // blank the lastThreeWords array
         for (let i = 0; i < lastThreeWords.length; i++) {
             const keys = Object.keys(lastThreeWords[i]);
             for (let j = 0; j < keys.length; j++) {
+                // I am aware that my code mutates type, as key romanized is intended to hold an array
+                // I am also aware that this is suboptimal and incurs a performance penalty
                 lastThreeWords[i][keys[j]] = "";
             }
         }
@@ -410,6 +450,7 @@ const renderGame = function() {
         document.getElementById("slot-0").classList.remove("fadeIn", "translateFadeOut");
         document.getElementById("slot-1").classList.remove("fadeIn", "translate");
         document.getElementById("slot-2").classList.remove("fadeIn", "translateFadeIn");
+    // render to slot 1
     } else if (game.playedWords.length === 1) {
         saveToSlot(1);
         renderHTML(1);
