@@ -106,9 +106,9 @@ const game = {
     // this pushes the played word into the array of already played words, then kicks off the other rules-enforcement logic
     pushWord: function(input) {
         this.playedWords[this.playedWords.length] = input;
-
         let convertedInput = "";
 
+        // handle lowercase Katakana
         for (let i = 0; i < input.length; i++) {
             if (input[i] === "ァ") {
                 convertedInput += "ア";
@@ -129,7 +129,7 @@ const game = {
 
         if ((this.checkValidity() === false || this.checkN() === false) && this.playedWords.length > 1) {
             this.resetGame();
-            // other game over code can go here if we want anything to happen upon loss
+            // other game over code can go here if we want anything additional to happen upon loss
         }
     },
     // This enforces the main rule of Shiritori:  the last phoneme of prior word must match first phoneme of following word
@@ -181,27 +181,6 @@ const game = {
                 if (currentStart1 === "じ" || currentStart1 === "ぢ" || currentStart1 === "ジ" || currentStart1 === "ヂ") {
                     return true;
                 }
-            // special casing for lowercase Katakana ending
-            // } else if (prevEnd1 === "ァ") {
-            //     if (currentStart1 === "ア" || currentStart1 === "あ") {
-            //         return true;
-            //     }
-            // } else if (prevEnd1 === "ィ") {
-            //     if (currentStart1 === "イ" || currentStart1 === "い") {
-            //         return true;
-            //     }
-            // } else if (prevEnd1 === "ゥ") {
-            //     if (currentStart1 === "ウ" || currentStart1 === "う") {
-            //         return true;
-            //     }
-            // } else if (prevEnd1 === "ェ") {
-            //     if (currentStart1 === "エ" || currentStart1 === "え") {
-            //         return true;
-            //     }
-            // } else if (prevEnd1 === "ォ") {
-            //     if (currentStart1 === "オ" || currentStart1 === "お") {
-            //         return true;
-            //     }
             } else {
                 console.log("Game over:  New word doesn't start with ending sound of prior word.");
                 alert("Game over:  New word didn't start with the ending of the last word.");
