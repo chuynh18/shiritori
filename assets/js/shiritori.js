@@ -119,6 +119,10 @@ const game = {
             console.log("Game over:  Word ends with ん.");
             alert("Game over:  Word ended in ん.");
             return false; // game over, check failed because word ended in ん
+        } else if (this.playedWords[this.playedWords.length-1][this.playedWords[this.playedWords.length-1].length-1] === "ン") {
+            console.log("Game over:  Word ends with ン.");
+            alert("Game over:  Word ended in ン.");
+            return false; // game over, check failed because word ended in ン
         } else {
             return true;
         }
@@ -226,7 +230,7 @@ const game = {
                 } else if (!found && input[i] === "ー") {
                     const lastLetterOfLastSyllable = output[output.length-1][output[output.length-1].length-1];
                     const lastSyllable = output[output.length-1];
-                    
+
                     if (lastLetterOfLastSyllable === "a") {
                         output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ā";
                     } else if (lastLetterOfLastSyllable === "i") {
