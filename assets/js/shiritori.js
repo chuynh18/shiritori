@@ -147,6 +147,27 @@ const game = {
                 if (currentStart1 === "じ" || currentStart1 === "ぢ" || currentStart1 === "ジ" || currentStart1 === "ヂ") {
                     return true;
                 }
+            // special casing for lowercase Katakana ending
+            } else if (prevEnd1 === "ァ") {
+                if (currentStart1 === "ア" || currentStart1 === "あ") {
+                    return true;
+                }
+            } else if (prevEnd1 === "ィ") {
+                if (currentStart1 === "イ" || currentStart1 === "い") {
+                    return true;
+                }
+            } else if (prevEnd1 === "ゥ") {
+                if (currentStart1 === "ウ" || currentStart1 === "う") {
+                    return true;
+                }
+            } else if (prevEnd1 === "ェ") {
+                if (currentStart1 === "エ" || currentStart1 === "え") {
+                    return true;
+                }
+            } else if (prevEnd1 === "ォ") {
+                if (currentStart1 === "オ" || currentStart1 === "お") {
+                    return true;
+                }
             } else {
                 console.log("Game over:  New word doesn't start with ending sound of prior word.");
                 alert("Game over:  New word didn't start with the ending of the last word.");
