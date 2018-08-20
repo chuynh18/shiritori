@@ -128,10 +128,16 @@ const game = {
     },
     romanize: function(input) {
         let output = [];
+        let containsKatakana = false;
 
         for (let i = 0; i < input.length; i++) {
             let syllable = "";
             let found = false
+
+            if (containsKatakana) {
+                break;
+            }
+
             for (let j = 0; j < this.jaCharsToEng.length; j++) {
                 if (input[i] === this.jaCharsToEng[j].ja) {
                     syllable += this.jaCharsToEng[j].en;
@@ -152,7 +158,7 @@ const game = {
             }
 
             // handle sokuon っ
-            if (!found) {
+            if (!found && input[i] === "っ") {
                 let nextSyllable = "";
 
                 for (let k = 0; k < this.jaCharsToEng.length; k++) {
@@ -167,10 +173,76 @@ const game = {
                 } else {
                     syllable = "t";
                 }
+            } else if (!found) { // if this branch runs, no hiragana was found.  Assume katakana
+                containsKatakana = true;
             }
 
             if (syllable !== "") {
                 output[output.length] = syllable;
+            }
+        }
+
+        // handle katakana
+        if (containsKatakana) {
+            for (let i = 0; i < input.length; i++) {
+                let syllable = "";
+                let found = false;
+
+                for (let j = 0; j < this.jaCharsToEng.length; j++) {
+                    if (input[i] === this.jaCharsToEng[j].ka) {
+                        syllable += this.jaCharsToEng[j].en;
+                        found = true;
+    
+                        if (this.jaCharsToEng[j].ka2) {
+                            for (let k = 2; k <= 4; k++) {
+                                if (input[i+1] === this.jaCharsToEng[j][`ka${k}`]) {
+                                    i++;
+                                    syllable = this.jaCharsToEng[j][`en${k}`];
+                                    break;
+                                }
+                            }
+                        }
+    
+                        break;
+                    }
+                }
+
+                // handle sokuon ッ
+                if (!found && input[i] === "ッ") {
+                    let nextSyllable = "";
+    
+                    for (let k = 0; k < this.jaCharsToEng.length; k++) {
+                        if (input[i+1] === this.jaCharsToEng[k].ka) {
+                            nextSyllable = this.jaCharsToEng[k].en;
+                            break;
+                        }
+                    }
+    
+                    if (!(nextSyllable[0] === "c" && nextSyllable[1] === "h")) {
+                        syllable = nextSyllable[0];
+                    } else {
+                        syllable = "t";
+                    }
+                } else if (!found && input[i] === "ー") {
+                    const lastLetterOfLastSyllable = output[output.length-1][output[output.length-1].length-1];
+                    const lastSyllable = output[output.length-1];
+                    
+                    if (lastLetterOfLastSyllable === "a") {
+                        output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ā";
+                    } else if (lastLetterOfLastSyllable === "i") {
+                        output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ī";
+                    } else if (lastLetterOfLastSyllable === "u") {
+                        output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ū";
+                    } else if (lastLetterOfLastSyllable === "e") {
+                        output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ē";
+                    } else if (lastLetterOfLastSyllable === "o") {
+                        output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ō";
+                    }
+                }
+
+                if (syllable !== "") {
+                    output[output.length] = syllable;
+                }
             }
         }
 
