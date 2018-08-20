@@ -95,17 +95,40 @@ const game = {
         }
     },
     checkValidity: function() {
+        // if input is hiragana, returns corresponding katakana character (and vice versa)
+        const lookupCounterpart = (input) => {
+            for (let i = 0; i < this.jaCharsToEng.length; i++) {
+                if (input === this.jaCharsToEng[i].ja) {
+                    return this.jaCharsToEng[i].ka;
+                } else if (input === this.jaCharsToEng[i].ka) {
+                    return this.jaCharsToEng[i].ja;
+                }
+
+                if (this.jaCharsToEng.ja2) {
+                    for (let j = 2; j <= 4; j++) {
+                        if (input === this.jaCharsToEng[i][`ja${j}`]) {
+                            return this.jaCharsToEng[i][`ka${j}`];
+                        } else if (input === this.jaCharsToEng[i][`ka${j}`]) {
+                            return this.jaCharsToEng[i][`ja${j}`];
+                        }
+                    }
+                }
+            }
+        }
+
         if (this.playedWords.length > 1) {
             const prevEnd1 = this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-1];
             const prevEnd2 = this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-2] + this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-1];
+            const prevEndConverted1 = lookupCounterpart(prevEnd1);
+            const prevEndConverted2 = lookupCounterpart(prevEnd1) + lookupCounterpart(this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-2]);
             const currentStart1 = this.playedWords[this.playedWords.length-1][0];
             const currentStart2 = this.playedWords[this.playedWords.length-1][0] + this.playedWords[this.playedWords.length-1][1];
 
-            if (prevEnd1 === "ゃ" || prevEnd1 === "ゅ" || prevEnd1 === "ょ") {
-                if (prevEnd2 === currentStart2) {
+            if (prevEnd1 === "ゃ" || prevEnd1 === "ゅ" || prevEnd1 === "ょ" || prevEnd1 === "ャ" || prevEnd1 === "ュ" || prevEnd1 === "ョ") {
+                if (prevEnd2 === currentStart2 || prevEndConverted2 === currentStart2) {
                     return true;
                 }
-            } else if (prevEnd1 === currentStart1) {
+            } else if (prevEnd1 === currentStart1 || prevEndConverted1 === currentStart1) {
                 return true;
             } else {
                 console.log("Game over:  New word doesn't start with ending sound of prior word.");
@@ -137,10 +160,6 @@ const game = {
         for (let i = 0; i < input.length; i++) {
             let syllable = "";
             let found = false
-
-            if (containsKatakana) {
-                break;
-            }
 
             for (let j = 0; j < this.jaCharsToEng.length; j++) {
                 if (input[i] === this.jaCharsToEng[j].ja) {
@@ -179,6 +198,7 @@ const game = {
                 }
             } else if (!found) { // if this branch runs, no hiragana was found.  Assume katakana
                 containsKatakana = true;
+                break;
             }
 
             if (syllable !== "") {
