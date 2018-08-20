@@ -3,6 +3,7 @@
 // === All Shiritori game data and logic lives inside this game object ===
 const game = {
     playedWords: [], // stores all the words that have been played in the current round; is reset to empty array upon game reset
+    playedWordsCheck: [], // same as above but used for checking dupes (necessary because I learned about uppercase/lowercase Katakana far after writing the code)
     jaCharsToEng: [ // lookup table of Hiragana, Katakana, and associated Romaji; used to generate Romaji
         {ja: "あ", en: "a", ka: "ア"},
         {ja: "い", en: "i", ka: "イ"},
@@ -82,7 +83,19 @@ const game = {
     // this enforces a rule of Shiritori:  words cannot be used more than once
     // once this check is passed, it kicks off all the other game logic
     checkRepeatsThenPlay: function(input) {
-        if (this.playedWords.indexOf(input) !== -1) {
+        if (input === "ァ") {
+            input = "ア";
+        } else if (input === "ィ") {
+            input = "イ";
+        } else if (input === "ゥ") {
+            input = "ウ";
+        } else if (input === "ェ") {
+            input = "エ";
+        } else if (input === "ォ") {
+            input = "オ";
+        }
+
+        if (this.playedWordsCheck.indexOf(input) !== -1) {
             console.log("Game over:  Repeat detected.");
             alert("Game over:  A word was repeated.");
             this.resetGame();
@@ -93,6 +106,27 @@ const game = {
     // this pushes the played word into the array of already played words, then kicks off the other rules-enforcement logic
     pushWord: function(input) {
         this.playedWords[this.playedWords.length] = input;
+
+        let convertedInput = "";
+
+        for (let i = 0; i < input.length; i++) {
+            if (input[i] === "ァ") {
+                convertedInput += "ア";
+            } else if (input[i] === "ィ") {
+                convertedInput += "イ";
+            } else if (input[i] === "ゥ") {
+                convertedInput += "ウ";
+            } else if (input[i] === "ェ") {
+                convertedInput += "エ";
+            } else if (input[i] === "ォ") {
+                convertedInput += "オ";
+            } else {
+                convertedInput += input[i];
+            }
+        }
+
+        this.playedWordsCheck[this.playedWordsCheck.length] = convertedInput;
+
         if ((this.checkValidity() === false || this.checkN() === false) && this.playedWords.length > 1) {
             this.resetGame();
             // other game over code can go here if we want anything to happen upon loss
@@ -126,13 +160,13 @@ const game = {
         // this logic only makes sense to kick off after more than one word has been played
         // it basically compares the ending of the prior word with the beginning of the following word
         // there are some special cases to account for digraphs and the "ji" phoneme
-        if (this.playedWords.length > 1) {
-            const prevEnd1 = this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-1];
-            const prevEnd2 = this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-2] + this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-1];
+        if (this.playedWordsCheck.length > 1) {
+            const prevEnd1 = this.playedWordsCheck[this.playedWordsCheck.length-2][this.playedWordsCheck[this.playedWordsCheck.length-2].length-1];
+            const prevEnd2 = this.playedWordsCheck[this.playedWordsCheck.length-2][this.playedWordsCheck[this.playedWordsCheck.length-2].length-2] + this.playedWordsCheck[this.playedWordsCheck.length-2][this.playedWordsCheck[this.playedWordsCheck.length-2].length-1];
             const prevEndConverted1 = lookupCounterpart(prevEnd1); // this (and the following) variable are specifically to handle Hiragana-Katakana comparisons
-            const prevEndConverted2 = lookupCounterpart(prevEnd1) + lookupCounterpart(this.playedWords[this.playedWords.length-2][this.playedWords[this.playedWords.length-2].length-2]);
-            const currentStart1 = this.playedWords[this.playedWords.length-1][0];
-            const currentStart2 = this.playedWords[this.playedWords.length-1][0] + this.playedWords[this.playedWords.length-1][1];
+            const prevEndConverted2 = lookupCounterpart(prevEnd1) + lookupCounterpart(this.playedWordsCheck[this.playedWordsCheck.length-2][this.playedWordsCheck[this.playedWordsCheck.length-2].length-2]);
+            const currentStart1 = this.playedWordsCheck[this.playedWordsCheck.length-1][0];
+            const currentStart2 = this.playedWordsCheck[this.playedWordsCheck.length-1][0] + this.playedWordsCheck[this.playedWordsCheck.length-1][1];
 
             // this handles Hiragana and Katakana digraphs
             if (prevEnd1 === "ゃ" || prevEnd1 === "ゅ" || prevEnd1 === "ょ" || prevEnd1 === "ャ" || prevEnd1 === "ュ" || prevEnd1 === "ョ") {
@@ -148,26 +182,26 @@ const game = {
                     return true;
                 }
             // special casing for lowercase Katakana ending
-            } else if (prevEnd1 === "ァ") {
-                if (currentStart1 === "ア" || currentStart1 === "あ") {
-                    return true;
-                }
-            } else if (prevEnd1 === "ィ") {
-                if (currentStart1 === "イ" || currentStart1 === "い") {
-                    return true;
-                }
-            } else if (prevEnd1 === "ゥ") {
-                if (currentStart1 === "ウ" || currentStart1 === "う") {
-                    return true;
-                }
-            } else if (prevEnd1 === "ェ") {
-                if (currentStart1 === "エ" || currentStart1 === "え") {
-                    return true;
-                }
-            } else if (prevEnd1 === "ォ") {
-                if (currentStart1 === "オ" || currentStart1 === "お") {
-                    return true;
-                }
+            // } else if (prevEnd1 === "ァ") {
+            //     if (currentStart1 === "ア" || currentStart1 === "あ") {
+            //         return true;
+            //     }
+            // } else if (prevEnd1 === "ィ") {
+            //     if (currentStart1 === "イ" || currentStart1 === "い") {
+            //         return true;
+            //     }
+            // } else if (prevEnd1 === "ゥ") {
+            //     if (currentStart1 === "ウ" || currentStart1 === "う") {
+            //         return true;
+            //     }
+            // } else if (prevEnd1 === "ェ") {
+            //     if (currentStart1 === "エ" || currentStart1 === "え") {
+            //         return true;
+            //     }
+            // } else if (prevEnd1 === "ォ") {
+            //     if (currentStart1 === "オ" || currentStart1 === "お") {
+            //         return true;
+            //     }
             } else {
                 console.log("Game over:  New word doesn't start with ending sound of prior word.");
                 alert("Game over:  New word didn't start with the ending of the last word.");
@@ -177,11 +211,11 @@ const game = {
     },
     // this enforces a rule of Shiritori:  words cannot end in ん or ン ("n" sound), as no words begin this way
     checkN: function() {
-        if (this.playedWords[this.playedWords.length-1][this.playedWords[this.playedWords.length-1].length-1] === "ん") {
+        if (this.playedWordsCheck[this.playedWordsCheck.length-1][this.playedWordsCheck[this.playedWordsCheck.length-1].length-1] === "ん") {
             console.log("Game over:  Word ends with ん.");
             alert("Game over:  Word ended in ん.");
             return false; // game over, check failed because word ended in ん
-        } else if (this.playedWords[this.playedWords.length-1][this.playedWords[this.playedWords.length-1].length-1] === "ン") {
+        } else if (this.playedWordsCheck[this.playedWordsCheck.length-1][this.playedWordsCheck[this.playedWordsCheck.length-1].length-1] === "ン") {
             console.log("Game over:  Word ends with ン.");
             alert("Game over:  Word ended in ン.");
             return false; // game over, check failed because word ended in ン
@@ -191,6 +225,7 @@ const game = {
     },
     resetGame: function() {
         this.playedWords.length = 0;
+        this.playedWordsCheck.length = 0;
     }
 }
 
