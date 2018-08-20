@@ -78,7 +78,7 @@ const game = {
         {ja: "ぺ", en: "pe", ka: "ペ"},
         {ja: "ぽ", en: "po", ka: "ポ"}
     ],
-    timer: 30,
+    timer: 30, // someday this will get used
     checkRepeatsThenPlay: function(input) {
         if (this.playedWords.indexOf(input) !== -1) {
             console.log("Game over:  Repeat detected.");
@@ -306,12 +306,12 @@ const submitWord = function() {
     }
 }
 
-const preventSubmission = function(event) {
+const submitOnEnter = function(event) {
     var key = event.charCode || event.keyCode || 0;     
-  if (key == 13) {
-    event.preventDefault();
-    submitWord();
-  }
+    if (key == 13) {
+        event.preventDefault();
+        submitWord();
+    }
 }
 
 const lastThreeWords = [
@@ -436,6 +436,7 @@ const renderGame = function() {
         renderHTML(1);
         renderHTML(2);
 
+        // not happy about this hack...
         void document.getElementById("slot-0").offsetWidth;
         void document.getElementById("slot-1").offsetWidth;
         void document.getElementById("slot-2").offsetWidth;
