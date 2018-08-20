@@ -354,7 +354,7 @@ const renderGame = function() {
             lastThreeWords[slotNum].jaWithoutLastChar = "";
             lastThreeWords[slotNum].jaLastChar = lastThreeWords[slotNum].ja;
         } else {
-            if (lastThreeWords[slotNum].ja[1] === "ゃ" || lastThreeWords[slotNum].ja[1] === "ゅ" || lastThreeWords[slotNum].ja[1] === "ょ") {
+            if (lastThreeWords[slotNum].ja[1] === "ゃ" || lastThreeWords[slotNum].ja[1] === "ゅ" || lastThreeWords[slotNum].ja[1] === "ょ" || lastThreeWords[slotNum].ja[1] === "ャ" || lastThreeWords[slotNum].ja[1] === "ュ" || lastThreeWords[slotNum].ja[1] === "ョ") {
                 lastThreeWords[slotNum].jaWithoutFirstChar = lastThreeWords[slotNum].ja.slice(2);
                 lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja[0] + lastThreeWords[slotNum].ja[1];
             } else {
@@ -362,7 +362,7 @@ const renderGame = function() {
                 lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja[0];
             }
 
-            if (lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ゃ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ゅ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ょ") {
+            if (lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ゃ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ゅ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ょ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ャ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ュ" || lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1] === "ョ") {
                 lastThreeWords[slotNum].jaWithoutLastChar = lastThreeWords[slotNum].ja.slice(0, -2);
                 lastThreeWords[slotNum].jaLastChar = lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-2] + lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1];
             } else {
