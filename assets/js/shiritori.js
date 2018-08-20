@@ -422,6 +422,7 @@ const renderGame = function() {
 
         document.getElementById("slot-2").classList.add("fadeIn");
     } else {
+        // ugh javascript why
         lastThreeWords[0] = JSON.parse(JSON.stringify(lastThreeWords[1]));
         lastThreeWords[1] = JSON.parse(JSON.stringify(lastThreeWords[2]));
 
