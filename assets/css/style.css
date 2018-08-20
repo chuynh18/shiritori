@@ -49,7 +49,15 @@ input, button {
 }
 
 #slot-1-ja-last, #slot-2-ja-first, #slot-1-en-last, #slot-2-en-first, #slot-0-ja-last, #slot-0-en-last {
-    background-color: cornflowerblue;
+    background-color: rgb(137, 170, 229);
+}
+
+#slot-2-ja-last, #slot-2-en-last {
+    background-color: rgb(229, 137, 137);
+}
+
+.purple {
+    background-color: rgb(218, 137, 229) !important;
 }
 
 .fadeIn {

@@ -337,9 +337,9 @@ const submitOnEnter = function(event) {
 // this way, each word is only processed once, after it was initially played
 // we don't have to recompute words; only read them from this array
 const lastThreeWords = [
-    {ja: "", jaFirstChar: "", jaLastChar:"", jaWithoutFirstChar: "", jaWithoutLastChar: "", meaning: "", romanized: "", romanizedWithoutLastChar: "", romanizedWithoutFirstChar: ""},
-    {ja: "", jaFirstChar: "", jaLastChar:"", jaWithoutFirstChar: "", jaWithoutLastChar: "", meaning: "", romanized: "", romanizedWithoutLastChar: "", romanizedWithoutFirstChar: ""},
-    {ja: "", jaFirstChar: "", jaLastChar:"", jaWithoutFirstChar: "", jaWithoutLastChar: "", meaning: "", romanized: "", romanizedWithoutLastChar: "", romanizedWithoutFirstChar: ""}
+    {ja: "", jaFirstChar: "", jaLastChar:"", jaWithoutFirstChar: "", jaWithoutLastChar: "", meaning: "", romanized: "", romanizedWithoutLastChar: "", romanizedWithoutFirstChar: "", romanizedWithoutFirstOrLastChar: ""},
+    {ja: "", jaFirstChar: "", jaLastChar:"", jaWithoutFirstChar: "", jaWithoutLastChar: "", meaning: "", romanized: "", romanizedWithoutLastChar: "", romanizedWithoutFirstChar: "", romanizedWithoutFirstOrLastChar: ""},
+    {ja: "", jaFirstChar: "", jaLastChar:"", jaWithoutFirstChar: "", jaWithoutLastChar: "", meaning: "", romanized: "", romanizedWithoutLastChar: "", romanizedWithoutFirstChar: "", romanizedWithoutFirstOrLastChar: ""}
 ];
 
 // This function and its inner helper functions handle virtually all the DOM manipulation necessary to make the game display
@@ -351,8 +351,8 @@ const renderGame = function() {
         document.getElementById("slot-0-en").innerHTML = '<span id="slot-0-en-last"></span>';
         document.getElementById("slot-1-ja").innerHTML = '<span id="slot-1-ja-last"></span>';
         document.getElementById("slot-1-en").innerHTML = '<span id="slot-1-en-last"></span>';
-        document.getElementById("slot-2-ja").innerHTML = '<span id="slot-2-ja-first"></span>';
-        document.getElementById("slot-2-en").innerHTML = '<span id="slot-2-en-first"></span>';
+        document.getElementById("slot-2-ja").innerHTML = '<span class="" id="slot-2-ja-first"></span><span id="slot-2-ja-middle"></span><span id="slot-2-ja-last"></span>';
+        document.getElementById("slot-2-en").innerHTML = '<span class="" id="slot-2-en-first"></span><span id="slot-2-en-middle"></span><span id="slot-2-en-last"></span>';
         document.getElementById("slot-0-meaning").textContent = "";
         document.getElementById("slot-1-meaning").textContent = "";
         document.getElementById("slot-2-meaning").textContent = "";
@@ -367,12 +367,24 @@ const renderGame = function() {
             document.getElementById(`slot-${slotNum}-ja`).insertBefore(document.createTextNode(lastThreeWords[slotNum].jaWithoutLastChar), document.getElementById(`slot-${slotNum}-ja-last`));
             document.getElementById(`slot-${slotNum}-ja-last`).textContent = lastThreeWords[slotNum].jaLastChar;
             document.getElementById(`slot-${slotNum}-en`).insertBefore(document.createTextNode(`${lastThreeWords[slotNum].romanizedWithoutLastChar}`), document.getElementById(`slot-${slotNum}-en-last`));
-            document.getElementById(`slot-${slotNum}-en-last`).textContent = `${lastThreeWords[slotNum].romanized[lastThreeWords[slotNum].romanized.length-1]}`;
+            document.getElementById(`slot-${slotNum}-en-last`).textContent = lastThreeWords[slotNum].romanized[lastThreeWords[slotNum].romanized.length-1];
         } else {
-            document.getElementById(`slot-${slotNum}-ja-first`).textContent = lastThreeWords[2].jaFirstChar;
-            document.getElementById(`slot-${slotNum}-ja`).appendChild(document.createTextNode(lastThreeWords[2].jaWithoutFirstChar));
-            document.getElementById(`slot-${slotNum}-en`).appendChild(document.createTextNode(lastThreeWords[2].romanizedWithoutFirstChar));
-            document.getElementById(`slot-${slotNum}-en-first`).textContent = lastThreeWords[2].romanized[0];
+            if (lastThreeWords[slotNum].ja.length > 1) {
+                document.getElementById(`slot-${slotNum}-ja-first`).classList.remove("purple");
+                document.getElementById(`slot-${slotNum}-en-first`).classList.remove("purple");
+                document.getElementById(`slot-${slotNum}-ja-first`).textContent = lastThreeWords[slotNum].jaFirstChar;
+                document.getElementById(`slot-${slotNum}-ja-middle`).textContent = lastThreeWords[slotNum].jaWithoutFirstOrLastChar;
+                document.getElementById(`slot-${slotNum}-ja-last`).textContent = lastThreeWords[slotNum].jaLastChar;
+                document.getElementById(`slot-${slotNum}-en-first`).textContent = lastThreeWords[slotNum].romanized[0];
+                document.getElementById(`slot-${slotNum}-en-middle`).textContent = lastThreeWords[slotNum].romanizedWithoutFirstOrLastChar;
+                document.getElementById(`slot-${slotNum}-en-last`).textContent = lastThreeWords[slotNum].romanized[lastThreeWords[slotNum].romanized.length-1];
+            } else {
+                document.getElementById(`slot-${slotNum}-ja-first`).textContent = lastThreeWords[slotNum].jaFirstChar;
+                document.getElementById(`slot-${slotNum}-en-first`).textContent = lastThreeWords[slotNum].romanized[0];
+                document.getElementById(`slot-${slotNum}-ja-first`).classList.add("purple");
+                document.getElementById(`slot-${slotNum}-en-first`).classList.add("purple");
+            }
+            
         }
         document.getElementById(`slot-${slotNum}-meaning`).textContent = lastThreeWords[slotNum].meaning;
     }
@@ -387,9 +399,15 @@ const renderGame = function() {
         if (lastThreeWords[slotNum].romanized.length === 1) {
             lastThreeWords[slotNum].romanizedWithoutFirstChar = "";
             lastThreeWords[slotNum].romanizedWithoutLastChar = "";
+            lastThreeWords[slotNum].romanizedWithoutFirstOrLastChar = "";
         } else {
             lastThreeWords[slotNum].romanizedWithoutFirstChar = " • " + lastThreeWords[slotNum].romanized.slice(1).join(" • ");
             lastThreeWords[slotNum].romanizedWithoutLastChar = lastThreeWords[slotNum].romanized.slice(0, -1).join(" • ") + " • ";
+            if (lastThreeWords[slotNum].romanized.slice(1, -1).join(" • ") === "") {
+                lastThreeWords[slotNum].romanizedWithoutFirstOrLastChar = " • ";
+            } else {
+                lastThreeWords[slotNum].romanizedWithoutFirstOrLastChar = " • " + lastThreeWords[slotNum].romanized.slice(1, -1).join(" • ") + " • ";
+            }
         }
 
         // Same as above for the Hiragana or Katakana, but without the " • " in between each phoneme
@@ -398,7 +416,11 @@ const renderGame = function() {
             lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja;
             lastThreeWords[slotNum].jaWithoutLastChar = "";
             lastThreeWords[slotNum].jaLastChar = lastThreeWords[slotNum].ja;
+            lastThreeWords[slotNum].jaWithoutFirstOrLastChar = "";
         } else {
+            const processFirstChar = function() {
+                
+            }
             // special case logic for digraphs (as digraphs use 2 characters to represent a phoneme)
             // this is for the first phoneme
             if (lastThreeWords[slotNum].ja[1] === "ゃ" || lastThreeWords[slotNum].ja[1] === "ゅ" || lastThreeWords[slotNum].ja[1] === "ょ" || lastThreeWords[slotNum].ja[1] === "ャ" || lastThreeWords[slotNum].ja[1] === "ュ" || lastThreeWords[slotNum].ja[1] === "ョ") {
@@ -415,6 +437,14 @@ const renderGame = function() {
             } else {
                 lastThreeWords[slotNum].jaWithoutLastChar = lastThreeWords[slotNum].ja.slice(0, -1);
                 lastThreeWords[slotNum].jaLastChar = lastThreeWords[slotNum].ja[lastThreeWords[slotNum].ja.length-1];
+            }
+            // both first and last phonemes
+            if (lastThreeWords[slotNum].ja[1] === "ゃ" || lastThreeWords[slotNum].ja[1] === "ゅ" || lastThreeWords[slotNum].ja[1] === "ょ" || lastThreeWords[slotNum].ja[1] === "ャ" || lastThreeWords[slotNum].ja[1] === "ュ" || lastThreeWords[slotNum].ja[1] === "ョ") {
+                lastThreeWords[slotNum].jaWithoutFirstOrLastChar = lastThreeWords[slotNum].jaWithoutLastChar.slice(2);
+                lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja[0] + lastThreeWords[slotNum].ja[1];
+            } else {
+                lastThreeWords[slotNum].jaWithoutFirstOrLastChar = lastThreeWords[slotNum].jaWithoutLastChar.slice(1);
+                lastThreeWords[slotNum].jaFirstChar = lastThreeWords[slotNum].ja[0];
             }
         }
 
