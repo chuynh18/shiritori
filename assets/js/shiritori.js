@@ -1,5 +1,6 @@
 "use strict";
 
+// All Shiritori game logic lives inside this game object
 const game = {
     playedWords: [],
     jaCharsToEng: [
@@ -96,7 +97,7 @@ const game = {
     },
     checkValidity: function() {
         // if input is hiragana, returns corresponding katakana character (and vice versa)
-        const lookupCounterpart = (input) => {
+        const lookupCounterpart = input => {
             for (let i = 0; i < this.jaCharsToEng.length; i++) {
                 if (input === this.jaCharsToEng[i].ja) {
                     return this.jaCharsToEng[i].ka;
@@ -130,6 +131,10 @@ const game = {
                 }
             } else if (prevEnd1 === currentStart1 || prevEndConverted1 === currentStart1) {
                 return true;
+            } else if (prevEnd1 === "じ" || prevEnd1 === "ぢ" || prevEnd1 === "ジ" || prevEnd1 === "ヂ") {
+                if (currentStart1 === "じ" || currentStart1 === "ぢ" || currentStart1 === "ジ" || currentStart1 === "ヂ") {
+                    return true;
+                }
             } else {
                 console.log("Game over:  New word doesn't start with ending sound of prior word.");
                 alert("Game over:  New word didn't start with the ending of the last word.");
@@ -283,6 +288,8 @@ const game = {
         return output;
     }
 }
+
+// and all the code that lives beyond this comment handles page rendering, DOM manipulation, etc.
 
 const submitWord = function() {
     const input = document.getElementById("shiritori");
