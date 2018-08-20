@@ -480,20 +480,21 @@ const renderGame = function() {
         document.getElementById("slot-0").classList.remove("fadeIn", "translateFadeOut");
         document.getElementById("slot-1").classList.remove("fadeIn", "translate");
         document.getElementById("slot-2").classList.remove("fadeIn", "translateFadeIn");
-    // render to slot 1
+    // render first word to slot 1 with a fade in
     } else if (game.playedWords.length === 1) {
         saveToSlot(1);
         renderHTML(1);
 
         document.getElementById("slot-1").classList.add("fadeIn");
-
+    // render second word to slot 2 with a fade in
     } else if (game.playedWords.length === 2){
         saveToSlot(2);
         renderHTML(2);
 
         document.getElementById("slot-2").classList.add("fadeIn");
+    // for all subsequent turns, slot 0 slides left and fades out, slot 1 slides left, and slot 2 slides left and fades in
     } else {
-        // ugh javascript why
+        // ugh JavaScript why (this is a manual shifting of the array to the left, but I don't want the array indices to reference the objects)
         lastThreeWords[0] = JSON.parse(JSON.stringify(lastThreeWords[1]));
         lastThreeWords[1] = JSON.parse(JSON.stringify(lastThreeWords[2]));
 
@@ -507,7 +508,7 @@ const renderGame = function() {
         renderHTML(1);
         renderHTML(2);
 
-        // not happy about this hack...
+        // not happy about this hack...  (this makes CSS animations always play for words 3 and greater)
         void document.getElementById("slot-0").offsetWidth;
         void document.getElementById("slot-1").offsetWidth;
         void document.getElementById("slot-2").offsetWidth;
