@@ -1,6 +1,6 @@
 "use strict";
 
-// All Shiritori game logic lives inside this game object
+// === All Shiritori game data and logic lives inside this game object ===
 const game = {
     playedWords: [],
     jaCharsToEng: [
@@ -160,25 +160,81 @@ const game = {
     },
     resetGame: function() {
         this.playedWords.length = 0;
-    },
-    romanize: function(input) {
-        let output = [];
-        let containsKatakana = false;
+    }
+}
 
+// === and all the code that lives beyond this comment handles anything related to page rendering, DOM manipulation, etc. ===
+
+// Takes Hiragana or Katakana as input and generates Romaji.  Properly handles Sokuon and (for Katakana) Chōonpu
+const romanize = function(input) {
+    let output = [];
+    let containsKatakana = false;
+
+    for (let i = 0; i < input.length; i++) {
+        let syllable = "";
+        let found = false
+
+        for (let j = 0; j < game.jaCharsToEng.length; j++) {
+            if (input[i] === game.jaCharsToEng[j].ja) {
+                syllable += game.jaCharsToEng[j].en;
+                found = true;
+
+                if (game.jaCharsToEng[j].ja2) {
+                    for (let k = 2; k <= 4; k++) {
+                        if (input[i+1] === game.jaCharsToEng[j][`ja${k}`]) {
+                            i++;
+                            syllable = game.jaCharsToEng[j][`en${k}`];
+                            break;
+                        }
+                    }
+                }
+
+                break;
+            }
+        }
+
+        // handle sokuon っ
+        if (!found && input[i] === "っ") {
+            let nextSyllable = "";
+
+            for (let k = 0; k < game.jaCharsToEng.length; k++) {
+                if (input[i+1] === game.jaCharsToEng[k].ja) {
+                    nextSyllable = game.jaCharsToEng[k].en;
+                    break;
+                }
+            }
+
+            if (!(nextSyllable[0] === "c" && nextSyllable[1] === "h")) {
+                syllable = nextSyllable[0];
+            } else {
+                syllable = "t";
+            }
+        } else if (!found) { // if this branch runs, no hiragana was found.  Assume katakana
+            containsKatakana = true;
+            break;
+        }
+
+        if (syllable !== "") {
+            output[output.length] = syllable;
+        }
+    }
+
+    // handle katakana
+    if (containsKatakana) {
         for (let i = 0; i < input.length; i++) {
             let syllable = "";
-            let found = false
+            let found = false;
 
-            for (let j = 0; j < this.jaCharsToEng.length; j++) {
-                if (input[i] === this.jaCharsToEng[j].ja) {
-                    syllable += this.jaCharsToEng[j].en;
+            for (let j = 0; j < game.jaCharsToEng.length; j++) {
+                if (input[i] === game.jaCharsToEng[j].ka) {
+                    syllable += game.jaCharsToEng[j].en;
                     found = true;
 
-                    if (this.jaCharsToEng[j].ja2) {
+                    if (game.jaCharsToEng[j].ka2) {
                         for (let k = 2; k <= 4; k++) {
-                            if (input[i+1] === this.jaCharsToEng[j][`ja${k}`]) {
+                            if (input[i+1] === game.jaCharsToEng[j][`ka${k}`]) {
                                 i++;
-                                syllable = this.jaCharsToEng[j][`en${k}`];
+                                syllable = game.jaCharsToEng[j][`en${k}`];
                                 break;
                             }
                         }
@@ -188,13 +244,13 @@ const game = {
                 }
             }
 
-            // handle sokuon っ
-            if (!found && input[i] === "っ") {
+            // handle sokuon ッ
+            if (!found && input[i] === "ッ") {
                 let nextSyllable = "";
 
-                for (let k = 0; k < this.jaCharsToEng.length; k++) {
-                    if (input[i+1] === this.jaCharsToEng[k].ja) {
-                        nextSyllable = this.jaCharsToEng[k].en;
+                for (let k = 0; k < game.jaCharsToEng.length; k++) {
+                    if (input[i+1] === game.jaCharsToEng[k].ka) {
+                        nextSyllable = game.jaCharsToEng[k].en;
                         break;
                     }
                 }
@@ -204,95 +260,41 @@ const game = {
                 } else {
                     syllable = "t";
                 }
-            } else if (!found) { // if this branch runs, no hiragana was found.  Assume katakana
-                containsKatakana = true;
-                break;
+            } else if (!found && input[i] === "ー") {
+                const lastLetterOfLastSyllable = output[output.length-1][output[output.length-1].length-1];
+                const lastSyllable = output[output.length-1];
+
+                if (lastLetterOfLastSyllable === "a") {
+                    output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ā";
+                } else if (lastLetterOfLastSyllable === "i") {
+                    output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ī";
+                } else if (lastLetterOfLastSyllable === "u") {
+                    output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ū";
+                } else if (lastLetterOfLastSyllable === "e") {
+                    output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ē";
+                } else if (lastLetterOfLastSyllable === "o") {
+                    output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ō";
+                }
+            } else if (!found && input[i] === "ァ") { // hacked in logic for lowercase vowel sounds
+                syllable = "a";
+            } else if (!found && input[i] === "ィ") {
+                syllable = "i";
+            } else if (!found && input[i] === "ゥ") {
+                syllable = "u";
+            } else if (!found && input[i] === "ェ") {
+                syllable = "e";
+            } else if (!found && input[i] === "ォ") {
+                syllable = "o";
             }
 
             if (syllable !== "") {
                 output[output.length] = syllable;
             }
         }
-
-        // handle katakana
-        if (containsKatakana) {
-            for (let i = 0; i < input.length; i++) {
-                let syllable = "";
-                let found = false;
-
-                for (let j = 0; j < this.jaCharsToEng.length; j++) {
-                    if (input[i] === this.jaCharsToEng[j].ka) {
-                        syllable += this.jaCharsToEng[j].en;
-                        found = true;
-    
-                        if (this.jaCharsToEng[j].ka2) {
-                            for (let k = 2; k <= 4; k++) {
-                                if (input[i+1] === this.jaCharsToEng[j][`ka${k}`]) {
-                                    i++;
-                                    syllable = this.jaCharsToEng[j][`en${k}`];
-                                    break;
-                                }
-                            }
-                        }
-    
-                        break;
-                    }
-                }
-
-                // handle sokuon ッ
-                if (!found && input[i] === "ッ") {
-                    let nextSyllable = "";
-    
-                    for (let k = 0; k < this.jaCharsToEng.length; k++) {
-                        if (input[i+1] === this.jaCharsToEng[k].ka) {
-                            nextSyllable = this.jaCharsToEng[k].en;
-                            break;
-                        }
-                    }
-    
-                    if (!(nextSyllable[0] === "c" && nextSyllable[1] === "h")) {
-                        syllable = nextSyllable[0];
-                    } else {
-                        syllable = "t";
-                    }
-                } else if (!found && input[i] === "ー") {
-                    const lastLetterOfLastSyllable = output[output.length-1][output[output.length-1].length-1];
-                    const lastSyllable = output[output.length-1];
-
-                    if (lastLetterOfLastSyllable === "a") {
-                        output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ā";
-                    } else if (lastLetterOfLastSyllable === "i") {
-                        output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ī";
-                    } else if (lastLetterOfLastSyllable === "u") {
-                        output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ū";
-                    } else if (lastLetterOfLastSyllable === "e") {
-                        output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ē";
-                    } else if (lastLetterOfLastSyllable === "o") {
-                        output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ō";
-                    }
-                } else if (!found && input[i] === "ァ") { // hacked in logic for lowercase vowel sounds
-                    syllable = "a";
-                } else if (!found && input[i] === "ィ") {
-                    syllable = "i";
-                } else if (!found && input[i] === "ゥ") {
-                    syllable = "u";
-                } else if (!found && input[i] === "ェ") {
-                    syllable = "e";
-                } else if (!found && input[i] === "ォ") {
-                    syllable = "o";
-                }
-
-                if (syllable !== "") {
-                    output[output.length] = syllable;
-                }
-            }
-        }
-
-        return output;
     }
-}
 
-// and all the code that lives beyond this comment handles page rendering, DOM manipulation, etc.
+    return output;
+}
 
 const submitWord = function() {
     const input = document.getElementById("shiritori");
@@ -349,7 +351,7 @@ const renderGame = function() {
 
     const saveToSlot = function(slotNum) {
         lastThreeWords[slotNum].ja = game.playedWords[game.playedWords.length - 1];
-        lastThreeWords[slotNum].romanized = game.romanize(lastThreeWords[slotNum].ja);
+        lastThreeWords[slotNum].romanized = romanize(lastThreeWords[slotNum].ja);
         if (lastThreeWords[slotNum].romanized.length === 1) {
             lastThreeWords[slotNum].romanizedWithoutFirstChar = "";
             lastThreeWords[slotNum].romanizedWithoutLastChar = "";

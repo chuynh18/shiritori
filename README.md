@@ -21,8 +21,8 @@ Limitations
 -----------
 
 As mentioned, this is simply a proof-of-concept.  Known limitations are:
-* Does not actually know what words are actual Japanese words
+* Does not actually know what words are actual Japanese words, as I don't have access to a good Japanese dictionary file
     * So it won't limit you to just nouns (but of course...  it can't distinguish between real words and gibberish)
 * Text entry box is not restricted to only Japanese characters
   
-Of course, there may be bugs!
+This is merely a proof-of-concept (turning this into a real product would require access to a comprehensive Japanese dictionary file), and there may be bugs.  That being said, the core logic exists!
