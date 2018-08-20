@@ -242,6 +242,16 @@ const game = {
                     } else if (lastLetterOfLastSyllable === "o") {
                         output[output.length-1] = lastSyllable.slice(0, lastSyllable.length-1) + "ō";
                     }
+                } else if (!found && input[i] === "ァ") { // hacked in logic for lowercase vowel sounds
+                    syllable = "a";
+                } else if (!found && input[i] === "ィ") {
+                    syllable = "i";
+                } else if (!found && input[i] === "ゥ") {
+                    syllable = "u";
+                } else if (!found && input[i] === "ェ") {
+                    syllable = "e";
+                } else if (!found && input[i] === "ォ") {
+                    syllable = "o";
                 }
 
                 if (syllable !== "") {
