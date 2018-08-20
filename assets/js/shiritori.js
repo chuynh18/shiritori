@@ -95,8 +95,11 @@ const game = {
             // other game over code here
         }
     },
+    // This enforces the rules of Shiritori:  the last phoneme of prior word must match first phoneme of following word
+    // This method will match hiragana and katakana successfully.
+    // This function will also consider the following characters to be equivalent:  じ, ぢ, ジ, and ヂ
     checkValidity: function() {
-        // if input is hiragana, returns corresponding katakana character (and vice versa)
+        // helper function:  if input is hiragana, returns corresponding katakana character (and vice versa)
         const lookupCounterpart = input => {
             for (let i = 0; i < this.jaCharsToEng.length; i++) {
                 if (input === this.jaCharsToEng[i].ja) {

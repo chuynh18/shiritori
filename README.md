@@ -10,9 +10,11 @@ A [Japanese rhyming game](https://en.wikipedia.org/wiki/Shiritori).  This is jus
 Features
 --------
 * A very limited Japanese dictionary.  If the game recognizes the word you've used, it will show the meaning of that word in English.
+* Matching logic properly matches across both Hiragana and Katakana words.  (You can follow a Hiragana word with a Katakana word and vice versa.)
 * Automatically romanizes Hiragana and Katakana.  Handles [Sokuon](https://en.wikipedia.org/wiki/Sokuon) and (for Katakana) [Chōonpu](https://en.wikipedia.org/wiki/Ch%C5%8Donpu).
 * Highlights the phonemes that must match (last phoneme of leading word, first phoneme of following word).
-* Simple transition animations to help make the flow of the game more obvious.
+    * Highlighting properly handles [digraphs](https://en.wikipedia.org/wiki/Y%C5%8Don).
+* Simple transition animations to help make the flow and rules of the game more obvious.
 * The page should display just fine on mobile devices.
 
 Limitations
