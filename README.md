@@ -59,7 +59,7 @@ __The DOM manipulation code__ (and Romaji-generation code):
 * `lastThreeWords`:  Array that holds the last three words (along with various versions of those words) that have been played.  This array is used to draw the words to the page.
 * `renderGame()`:  Way-too-bulky function that handles all the drawing to the page.  There are three slots where words can be drawn.  Slot 0 is used only for fading out the oldest word.  Slot 1 holds the word from two turns ago.  Slot 2 holds the word that was just played, which is the word that must be followed up upon.
     * `resetHTML()`:  Helper function that blanks all three slots on the page.
-    * `renderHTML(slotNum)`:  slotNum can be 0, 1, or 2.  Causes the appropriate word to be rendered into the targeted slot.  Also handles applying the correct classes if the just-played word was one phoneme long or if a losing word was played.
+    * `renderHTML(slotNum)`:  slotNum can be 0, 1, or 2.  Causes the appropriate word to be rendered into the targeted slot.  Also handles applying the correct classes if the just-played word was one phoneme long or if a losing word was played (checks for `game.lossReason` being `1`, `2`, or `3` with appropriate logic for each).
     * `saveToSlot(slotNum)`:  reads from `game.playedWords`, generates all the necessary variations, and saves that data to the targeted index of the `lastThreeWords` array.
         * `lookupMeaning()`:  Performs a linear search through the `dictionary.js` file for the English meaning of the inputted word.  `dictionary.js` is extremely limited, and just exists as part of a stubbed-out feature.
     * The remainder of the logic actually places the words onto the page.
