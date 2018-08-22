@@ -26,3 +26,16 @@ As mentioned, this is simply a proof-of-concept.  Known limitations are:
 * Text entry box is not restricted to only Japanese characters
   
 This is merely a proof-of-concept (turning this into a real product would require access to a comprehensive Japanese dictionary file), and there may be bugs.  That being said, the core logic exists!
+
+If you're going to dig into the code...
+---------------------------------------
+
+`shiritori.js` is a `"strict mode";` script, and is roughly divided into two parts.  The first part consists of the `game` object that handles the Shiritori game logic, and the second part is a bunch of functions and function calls that are responsible for the visual aspects of the game (DOM manipulation, rendering to the page, etc.)  Note that the Romaji generation logic lives mostly with the 2nd half, but relies on the lookup table inside the game object.  Oops.
+
+The `game` object:  responsible for the Shiritori game logic (handles the rules of the game).  Also holds the Hiragana and Katakana lookup table.
+* `game.playedWords`:  an array that holds the words that the player(s) have used in the current round.  Is reset to `[]` upon loss.
+* `game.playedWordsCheck`:  same as above, but used to actually perform the rules checking.  This array holds the same words as the above array, but lowercase Katakana vowels are changed to uppercase first.  Is also reset to `[]` upon loss.
+* `game.jaCharsToEnglish`:  this is the Hiragana and Katakana lookup table.
+* `game.timer`:  defaults to 30 and is currently unused.  The idea is that once the game has started, the player(s) will be given 30 seconds to enter a word.
+* `game.checkRepeatsThenPlay`:  One of the rules of Shiritori is that a word can't be used twice.  This method checks the `game.playedWordsCheck` array to see if a word already exists there.  If it does, the game is reset.  Otherwise, the word is accepted for play and this method calls `game.pushWord(input)`.
+* `game.pushWord`:  

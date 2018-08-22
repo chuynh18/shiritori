@@ -83,19 +83,7 @@ const game = {
     // this enforces a rule of Shiritori:  words cannot be used more than once
     // once this check is passed, it kicks off all the other game logic
     checkRepeatsThenPlay: function(input) {
-        if (input === "ァ") {
-            input = "ア";
-        } else if (input === "ィ") {
-            input = "イ";
-        } else if (input === "ゥ") {
-            input = "ウ";
-        } else if (input === "ェ") {
-            input = "エ";
-        } else if (input === "ォ") {
-            input = "オ";
-        }
-
-        if (this.playedWordsCheck.indexOf(input) !== -1) {
+        if (this.playedWordsCheck.indexOf(this.uppercaseKatakana(input)) !== -1) {
             console.log("Game over:  Repeat detected.");
             alert("Game over:  A word was repeated.");
             this.resetGame();
@@ -106,26 +94,7 @@ const game = {
     // this pushes the played word into the array of already played words, then kicks off the other rules-enforcement logic
     pushWord: function(input) {
         this.playedWords[this.playedWords.length] = input;
-        let convertedInput = "";
-
-        // handle lowercase Katakana
-        for (let i = 0; i < input.length; i++) {
-            if (input[i] === "ァ") {
-                convertedInput += "ア";
-            } else if (input[i] === "ィ") {
-                convertedInput += "イ";
-            } else if (input[i] === "ゥ") {
-                convertedInput += "ウ";
-            } else if (input[i] === "ェ") {
-                convertedInput += "エ";
-            } else if (input[i] === "ォ") {
-                convertedInput += "オ";
-            } else {
-                convertedInput += input[i];
-            }
-        }
-
-        this.playedWordsCheck[this.playedWordsCheck.length] = convertedInput;
+        this.playedWordsCheck[this.playedWordsCheck.length] = this.uppercaseKatakana(input);
 
         if ((this.checkValidity() === false || this.checkN() === false) && this.playedWords.length > 1) {
             this.resetGame();
@@ -205,6 +174,28 @@ const game = {
     resetGame: function() {
         this.playedWords.length = 0;
         this.playedWordsCheck.length = 0;
+    },
+    uppercaseKatakana: function(input) {
+        let convertedInput = "";
+
+        // handle lowercase Katakana
+        for (let i = 0; i < input.length; i++) {
+            if (input[i] === "ァ") {
+                convertedInput += "ア";
+            } else if (input[i] === "ィ") {
+                convertedInput += "イ";
+            } else if (input[i] === "ゥ") {
+                convertedInput += "ウ";
+            } else if (input[i] === "ェ") {
+                convertedInput += "エ";
+            } else if (input[i] === "ォ") {
+                convertedInput += "オ";
+            } else {
+                convertedInput += input[i];
+            }
+        }
+
+        return convertedInput;
     }
 }
 
