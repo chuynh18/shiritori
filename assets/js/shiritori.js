@@ -159,7 +159,11 @@ const game = {
             } else if (prevEnd1 === "じ" || prevEnd1 === "ぢ" || prevEnd1 === "ジ" || prevEnd1 === "ヂ") {
                 if (currentStart1 === "じ" || currentStart1 === "ぢ" || currentStart1 === "ジ" || currentStart1 === "ヂ") {
                     return true;
-                }
+                }    
+            } else if (prevEnd1 === "ず" || prevEnd1 === "づ" || prevEnd1 === "ヅ" || prevEnd1 === "ズ") {
+                if (currentStart1 === "ず" || currentStart1 === "づ" || currentStart1 === "ヅ" || currentStart1 === "ズ") {
+                    return true;
+                }    
             } else {
                 this.lossReason = 2;
                 console.log("Game over:  New word doesn't start with ending sound of prior word.");
