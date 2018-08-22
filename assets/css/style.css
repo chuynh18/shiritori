@@ -53,11 +53,16 @@ input, button {
 }
 
 #slot-2-ja-last, #slot-2-en-last {
-    background-color: rgb(229, 137, 137);
+    background-color: rgb(158, 229, 137);
 }
 
-.purple {
-    background-color: rgb(218, 137, 229) !important;
+.cyan {
+    background-color: rgb(106, 233, 212) !important;
+}
+
+.invalid {
+    text-decoration: line-through;
+    background-color: rgb(255, 115, 115) !important;
 }
 
 .fadeIn {

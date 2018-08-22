@@ -82,11 +82,13 @@ const game = {
     timer: 30, // someday this will get used
     // this enforces a rule of Shiritori:  words cannot be used more than once
     // once this check is passed, it kicks off all the other game logic
+    lossReason: 0,  // 0 - no loss, 1 - dupe word, 2 - invalid starting phoneme, 3 - ends with "n" phoneme
     checkRepeatsThenPlay: function(input) {
         if (this.playedWordsCheck.indexOf(this.uppercaseKatakana(input)) !== -1) {
+            this.lossReason = 1;
             console.log("Game over:  Repeat detected.");
             alert("Game over:  A word was repeated.");
-            this.resetGame();
+            this.pushWord(input);
         } else {
             this.pushWord(input);
         }
@@ -95,10 +97,18 @@ const game = {
     pushWord: function(input) {
         this.playedWords[this.playedWords.length] = input;
         this.playedWordsCheck[this.playedWordsCheck.length] = this.uppercaseKatakana(input);
-
-        if ((this.checkValidity() === false || this.checkN() === false) && this.playedWords.length > 1) {
+        
+        if (this.lossReason === 1) {
+            renderGame();
             this.resetGame();
-            // other game over code can go here if we want anything additional to happen upon loss
+        } else {
+            if ((this.checkValidity() === false || this.checkN() === false) && this.playedWords.length > 1) {
+                renderGame();
+                this.resetGame();
+                // other game over code can go here if we want anything additional to happen upon loss
+            } else {
+                renderGame();
+            }
         }
     },
     // This enforces the main rule of Shiritori:  the last phoneme of prior word must match first phoneme of following word
@@ -151,6 +161,7 @@ const game = {
                     return true;
                 }
             } else {
+                this.lossReason = 2;
                 console.log("Game over:  New word doesn't start with ending sound of prior word.");
                 alert("Game over:  New word didn't start with the ending of the last word.");
                 return false; // game over, because the new word doesn't follow the rules
@@ -160,10 +171,12 @@ const game = {
     // this enforces a rule of Shiritori:  words cannot end in ん or ン ("n" sound), as no words begin this way
     checkN: function() {
         if (this.playedWordsCheck[this.playedWordsCheck.length-1][this.playedWordsCheck[this.playedWordsCheck.length-1].length-1] === "ん") {
+            this.lossReason = 3;
             console.log("Game over:  Word ends with ん.");
             alert("Game over:  Word ended in ん.");
             return false; // game over, check failed because word ended in ん
         } else if (this.playedWordsCheck[this.playedWordsCheck.length-1][this.playedWordsCheck[this.playedWordsCheck.length-1].length-1] === "ン") {
+            this.lossReason = 3;
             console.log("Game over:  Word ends with ン.");
             alert("Game over:  Word ended in ン.");
             return false; // game over, check failed because word ended in ン
@@ -174,6 +187,7 @@ const game = {
     resetGame: function() {
         this.playedWords.length = 0;
         this.playedWordsCheck.length = 0;
+        this.lossReason = 0;
     },
     uppercaseKatakana: function(input) {
         let convertedInput = "";
@@ -343,10 +357,13 @@ const romanize = function(input) {
 const submitWord = function() {
     const input = document.getElementById("shiritori");
 
+    if (game.playedWordsCheck.length === 0) {
+        renderGame();
+    }
+
     if (input.value.trim() !== "") {
         game.checkRepeatsThenPlay(input.value.trim());
         input.value = "";
-        renderGame();
     }
 }
 
@@ -382,6 +399,12 @@ const renderGame = function() {
         document.getElementById("slot-0-meaning").textContent = "";
         document.getElementById("slot-1-meaning").textContent = "";
         document.getElementById("slot-2-meaning").textContent = "";
+        document.getElementById("slot-2-ja-first").classList.remove("invalid");
+        document.getElementById("slot-2-en-first").classList.remove("invalid");
+        document.getElementById("slot-2-ja-middle").classList.remove("invalid");
+        document.getElementById("slot-2-en-middle").classList.remove("invalid");
+        document.getElementById("slot-2-ja-last").classList.remove("invalid");
+        document.getElementById("slot-2-en-last").classList.remove("invalid");
     }
 
     // reads a word from index slotNum in the lastThreeWords array and renders it onto the page in slot number slotNum
@@ -396,8 +419,8 @@ const renderGame = function() {
             document.getElementById(`slot-${slotNum}-en-last`).textContent = lastThreeWords[slotNum].romanized[lastThreeWords[slotNum].romanized.length-1];
         } else {
             if (lastThreeWords[slotNum].ja.length > 1) {
-                document.getElementById(`slot-${slotNum}-ja-first`).classList.remove("purple");
-                document.getElementById(`slot-${slotNum}-en-first`).classList.remove("purple");
+                document.getElementById(`slot-${slotNum}-ja-first`).classList.remove("cyan");
+                document.getElementById(`slot-${slotNum}-en-first`).classList.remove("cyan");
                 document.getElementById(`slot-${slotNum}-ja-first`).textContent = lastThreeWords[slotNum].jaFirstChar;
                 document.getElementById(`slot-${slotNum}-ja-middle`).textContent = lastThreeWords[slotNum].jaWithoutFirstOrLastChar;
                 document.getElementById(`slot-${slotNum}-ja-last`).textContent = lastThreeWords[slotNum].jaLastChar;
@@ -407,10 +430,32 @@ const renderGame = function() {
             } else {
                 document.getElementById(`slot-${slotNum}-ja-first`).textContent = lastThreeWords[slotNum].jaFirstChar;
                 document.getElementById(`slot-${slotNum}-en-first`).textContent = lastThreeWords[slotNum].romanized[0];
-                document.getElementById(`slot-${slotNum}-ja-first`).classList.add("purple");
-                document.getElementById(`slot-${slotNum}-en-first`).classList.add("purple");
+                document.getElementById(`slot-${slotNum}-ja-first`).classList.add("cyan");
+                document.getElementById(`slot-${slotNum}-en-first`).classList.add("cyan");
             }
             
+            if (game.lossReason === 1) {
+                console.log("lossReason: ", game.lossReason);
+                document.getElementById("slot-2-ja-first").classList.add("invalid");
+                document.getElementById("slot-2-en-first").classList.add("invalid");
+                document.getElementById("slot-2-ja-middle").classList.add("invalid");
+                document.getElementById("slot-2-en-middle").classList.add("invalid");
+                document.getElementById("slot-2-ja-last").classList.add("invalid");
+                document.getElementById("slot-2-en-last").classList.add("invalid");
+            } else if (game.lossReason === 2) {
+                console.log("lossReason: ", game.lossReason);
+                document.getElementById("slot-2-ja-first").classList.add("invalid");
+                document.getElementById("slot-2-en-first").classList.add("invalid");
+            } else if (game.lossReason === 3) {
+                console.log("lossReason: ", game.lossReason);
+                if (lastThreeWords[slotNum].ja.length > 1) {
+                    document.getElementById("slot-2-ja-last").classList.add("invalid");
+                    document.getElementById("slot-2-en-last").classList.add("invalid");
+                } else {
+                    document.getElementById("slot-2-ja-first").classList.add("invalid");
+                    document.getElementById("slot-2-en-first").classList.add("invalid");
+                }
+            }
         }
         document.getElementById(`slot-${slotNum}-meaning`).textContent = lastThreeWords[slotNum].meaning;
     }
@@ -418,6 +463,24 @@ const renderGame = function() {
     // reads the last word in the game.playedWords array and saves it to the lastThreeWords array in index slotNum
     // handles all the character manipulation necessary to make the game work
     const saveToSlot = function(slotNum) {
+
+        // look up the played word to see if it lives in our (extremely limited) dictionary file.
+        // if it does, we can show the English meaning of the word
+        const lookupMeaning = function() {
+            let found = false;
+            for (let i = 0; i < dictionary.length; i++) {
+                if (lastThreeWords[slotNum].ja === dictionary[i].ja) {
+                    lastThreeWords[slotNum].meaning = dictionary[i].en;
+                    found = true;
+                    break;
+                }
+            }
+    
+            if (!found) {
+                lastThreeWords[slotNum].meaning = "";
+            }
+        }
+
         lastThreeWords[slotNum].ja = game.playedWords[game.playedWords.length - 1]; // save the Hiragana/Katakana
         lastThreeWords[slotNum].romanized = romanize(lastThreeWords[slotNum].ja); // save the associated Romaji
 
@@ -444,9 +507,6 @@ const renderGame = function() {
             lastThreeWords[slotNum].jaLastChar = lastThreeWords[slotNum].ja;
             lastThreeWords[slotNum].jaWithoutFirstOrLastChar = "";
         } else {
-            const processFirstChar = function() {
-                
-            }
             // special case logic for digraphs (as digraphs use 2 characters to represent a phoneme)
             // this is for the first phoneme
             if (lastThreeWords[slotNum].ja[1] === "ゃ" || lastThreeWords[slotNum].ja[1] === "ゅ" || lastThreeWords[slotNum].ja[1] === "ょ" || lastThreeWords[slotNum].ja[1] === "ャ" || lastThreeWords[slotNum].ja[1] === "ュ" || lastThreeWords[slotNum].ja[1] === "ョ") {
@@ -474,20 +534,7 @@ const renderGame = function() {
             }
         }
 
-        // look up the played word to see if it lives in our (extremely limited) dictionary file.
-        // if it does, we can show the English meaning of the word
-        for (let i = 0; i < dictionary.length; i++) {
-            let found = false;
-            if (lastThreeWords[slotNum].ja === dictionary[i].ja) {
-                lastThreeWords[slotNum].meaning = dictionary[i].en;
-                found = true;
-                break;
-            }
-
-            if (!found) {
-                lastThreeWords[slotNum].meaning = "";
-            }
-        }
+        lookupMeaning();
     }
 
     if (game.playedWords.length === 0) {
@@ -511,6 +558,7 @@ const renderGame = function() {
         saveToSlot(1);
         renderHTML(1);
 
+        void document.getElementById("slot-1").offsetWidth;
         document.getElementById("slot-1").classList.add("fadeIn");
     // render second word to slot 2 with a fade in
     } else if (game.playedWords.length === 2){
